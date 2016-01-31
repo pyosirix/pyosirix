@@ -1,0 +1,10 @@
+#!/Library/Frameworks/Python.framework/Versions/2.7/Resources/Python.app/Contents/MacOS/Python
+# EASY-INSTALL-ENTRY-SCRIPT: 'scikit-image==0.12dev','console_scripts','skivi'
+__requires__ = 'scikit-image==0.12dev'
+import sys
+from pkg_resources import load_entry_point
+
+if __name__ == '__main__':
+    sys.exit(
+        load_entry_point('scikit-image==0.12dev', 'console_scripts', 'skivi')()
+    )
