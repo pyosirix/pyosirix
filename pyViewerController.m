@@ -52,7 +52,7 @@ static void pyViewerController_dealloc(pyViewerControllerObject *self)
 }
 
 # pragma mark -
-# pragma mark pyWaitObject str/repr
+# pragma mark pyViewerControllerObject str/repr
 
 static PyObject *pyViewerController_str(pyViewerControllerObject *self)
 {
@@ -66,7 +66,7 @@ static PyObject *pyViewerController_str(pyViewerControllerObject *self)
 }
 
 # pragma mark -
-# pragma mark pyWaitObject getters/setters
+# pragma mark pyViewerControllerObject getters/setters
 
 PyDoc_STRVAR(viewerControllerTitleAttr_doc,
 			 "The string title of the ViewerController window."
@@ -199,7 +199,7 @@ static PyGetSetDef pyViewerController_getsetters[] =
 };
 
 # pragma mark -
-# pragma mark pyWaitObject methods
+# pragma mark pyViewerControllerObject methods
 
 PyDoc_STRVAR(viewerControllerMaxMovieIdx_doc,
 			 "\n"
@@ -822,7 +822,7 @@ PyDoc_STRVAR(viewerController_doc,
 			 "via functions defined in the osirix module\n"
 			 "\n"
 			 "Example Usage:\n"
-			 "    >>> import osirix"
+			 "    >>> import osirix\n"
 			 "    >>> vc = osirix.frontmostViewer()\n"
 			 "    >>> print vc.title\n"
 			 );

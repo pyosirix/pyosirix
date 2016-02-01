@@ -41,6 +41,7 @@
 #import "pyWait.h"
 #import "pyDCMPix.h"
 #import "pyROI.h"
+#import "pyROIVolume.h"
 #import "pyDicomImage.h"
 #import "pyDicomSeries.h"
 #import "pyDicomStudy.h"
@@ -316,7 +317,7 @@ PyDoc_STRVAR(selectPath_doc,
 			 "\n"
 			 "Example:\n"
 			 "    >>> #Prints the contents of a python file.\n"
-			 "    >>> import io"
+			 "    >>> import io\n"
 			 "    >>> path = osirix.selectPath(dirs = False, extension = \"py\")\n"
 			 "    >>> if path:\n"
 			 "    ...     fl = open(path, 'r')\n"
@@ -366,6 +367,7 @@ PyMODINIT_FUNC initosirix()
 	[pyWait initTypeInModule:m];
 	[pyDCMPix initTypeInModule:m];
 	[pyROI initTypeInModule:m];
+//	[pyROIVolume initTypeInModule:m];
 	[pyDicomImage initTypeInModule:m];
 	[pyDicomSeries initTypeInModule:m];
 	[pyDicomStudy initTypeInModule:m];

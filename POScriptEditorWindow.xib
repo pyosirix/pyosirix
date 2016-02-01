@@ -69,13 +69,15 @@
 							<object class="NSMutableString" key="NSToolbarItemIdentifier">
 								<characters key="NS.bytes">2462541F-32F8-4DA8-B8D4-7652DE5FF6FC</characters>
 							</object>
-							<string key="NSToolbarItemLabel"/>
+							<string key="NSToolbarItemLabel">File Options</string>
 							<string key="NSToolbarItemPaletteLabel">File Options</string>
 							<nil key="NSToolbarItemToolTip"/>
 							<object class="NSPopUpButton" key="NSToolbarItemView" id="770431604">
-								<nil key="NSNextResponder"/>
+								<reference key="NSNextResponder"/>
 								<int key="NSvFlags">268</int>
 								<string key="NSFrame">{{0, 14}, {100, 25}}</string>
+								<reference key="NSSuperview"/>
+								<reference key="NSWindow"/>
 								<string key="NSReuseIdentifierKey">_NS:9</string>
 								<bool key="NSEnabled">YES</bool>
 								<object class="NSPopUpButtonCell" key="NSCell" id="206880228">
@@ -307,7 +309,7 @@
 							<string key="NSToolbarItemPaletteLabel"/>
 							<nil key="NSToolbarItemToolTip"/>
 							<object class="NSImageView" key="NSToolbarItemView" id="892608972">
-								<nil key="NSNextResponder"/>
+								<reference key="NSNextResponder"/>
 								<int key="NSvFlags">268</int>
 								<set class="NSMutableSet" key="NSDragTypes">
 									<string>Apple PDF pasteboard type</string>
@@ -318,6 +320,8 @@
 									<string>NeXT TIFF v4.0 pasteboard type</string>
 								</set>
 								<string key="NSFrame">{{0, 14}, {48, 48}}</string>
+								<reference key="NSSuperview"/>
+								<reference key="NSWindow"/>
 								<string key="NSReuseIdentifierKey">_NS:9</string>
 								<string key="NSHuggingPriority">{251, 251}</string>
 								<bool key="NSEnabled">YES</bool>
@@ -374,13 +378,15 @@
 							<object class="NSMutableString" key="NSToolbarItemIdentifier">
 								<characters key="NS.bytes">F1B5BC6E-CF52-4967-8887-60957C374F3C</characters>
 							</object>
-							<string key="NSToolbarItemLabel">Script Template</string>
-							<string key="NSToolbarItemPaletteLabel">Script Template</string>
+							<string key="NSToolbarItemLabel">Script Templates</string>
+							<string key="NSToolbarItemPaletteLabel">Script Templates</string>
 							<nil key="NSToolbarItemToolTip"/>
 							<object class="NSPopUpButton" key="NSToolbarItemView" id="437016728">
-								<nil key="NSNextResponder"/>
+								<reference key="NSNextResponder"/>
 								<int key="NSvFlags">268</int>
 								<string key="NSFrame">{{0, 14}, {100, 25}}</string>
+								<reference key="NSSuperview"/>
+								<reference key="NSWindow"/>
 								<string key="NSReuseIdentifierKey">_NS:9</string>
 								<bool key="NSEnabled">YES</bool>
 								<object class="NSPopUpButtonCell" key="NSCell" id="16860353">
@@ -395,14 +401,46 @@
 									<string key="NSKeyEquivalent"/>
 									<int key="NSPeriodicDelay">400</int>
 									<int key="NSPeriodicInterval">75</int>
-									<nil key="NSMenuItem"/>
+									<object class="NSMenuItem" key="NSMenuItem" id="797332558">
+										<reference key="NSMenu" ref="31925181"/>
+										<string key="NSTitle">DicomTool</string>
+										<string key="NSKeyEquiv"/>
+										<int key="NSMnemonicLoc">2147483647</int>
+										<int key="NSState">1</int>
+										<reference key="NSOnImage" ref="956481879"/>
+										<reference key="NSMixedImage" ref="102452423"/>
+										<string key="NSAction">_popUpItemAction:</string>
+										<reference key="NSTarget" ref="16860353"/>
+									</object>
 									<bool key="NSMenuItemRespectAlignment">YES</bool>
 									<object class="NSMenu" key="NSMenu" id="31925181">
 										<string key="NSTitle">OtherViews</string>
-										<array class="NSMutableArray" key="NSMenuItems"/>
+										<array class="NSMutableArray" key="NSMenuItems">
+											<object class="NSMenuItem" id="5578668">
+												<reference key="NSMenu" ref="31925181"/>
+												<string key="NSTitle">ImageFilter</string>
+												<string key="NSKeyEquiv"/>
+												<int key="NSMnemonicLoc">2147483647</int>
+												<reference key="NSOnImage" ref="956481879"/>
+												<reference key="NSMixedImage" ref="102452423"/>
+												<string key="NSAction">_popUpItemAction:</string>
+												<reference key="NSTarget" ref="16860353"/>
+											</object>
+											<object class="NSMenuItem" id="452832646">
+												<reference key="NSMenu" ref="31925181"/>
+												<string key="NSTitle">ROITool</string>
+												<string key="NSKeyEquiv"/>
+												<int key="NSMnemonicLoc">2147483647</int>
+												<reference key="NSOnImage" ref="956481879"/>
+												<reference key="NSMixedImage" ref="102452423"/>
+												<string key="NSAction">_popUpItemAction:</string>
+												<reference key="NSTarget" ref="16860353"/>
+											</object>
+											<reference ref="797332558"/>
+										</array>
 										<reference key="NSMenuFont" ref="158896810"/>
 									</object>
-									<int key="NSSelectedIndex">-1</int>
+									<int key="NSSelectedIndex">2</int>
 									<int key="NSPreferredEdge">1</int>
 									<bool key="NSUsesItemFromMenu">YES</bool>
 									<bool key="NSAltersState">YES</bool>
@@ -1137,6 +1175,7 @@ wGw</bytes>
 											<string key="NSFrame">{{566, 1}, {16, 174}}</string>
 											<reference key="NSSuperview" ref="850120208"/>
 											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView"/>
 											<string key="NSReuseIdentifierKey">_NS:83</string>
 											<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 											<reference key="NSTarget" ref="850120208"/>
@@ -1331,6 +1370,30 @@ wGw</bytes>
 						<reference key="destination" ref="38615965"/>
 					</object>
 					<int key="connectionID">542</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">addTemplate:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="5578668"/>
+					</object>
+					<int key="connectionID">546</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">addTemplate:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="452832646"/>
+					</object>
+					<int key="connectionID">547</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">addTemplate:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="797332558"/>
+					</object>
+					<int key="connectionID">548</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -1535,7 +1598,11 @@ wGw</bytes>
 					<object class="IBObjectRecord">
 						<int key="objectID">494</int>
 						<reference key="object" ref="31925181"/>
-						<array class="NSMutableArray" key="children"/>
+						<array class="NSMutableArray" key="children">
+							<reference ref="5578668"/>
+							<reference ref="452832646"/>
+							<reference ref="797332558"/>
+						</array>
 						<reference key="parent" ref="16860353"/>
 					</object>
 					<object class="IBObjectRecord">
@@ -1669,6 +1736,21 @@ wGw</bytes>
 						<reference key="object" ref="561959582"/>
 						<reference key="parent" ref="65963903"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">543</int>
+						<reference key="object" ref="5578668"/>
+						<reference key="parent" ref="31925181"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">544</int>
+						<reference key="object" ref="452832646"/>
+						<reference key="parent" ref="31925181"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">545</int>
+						<reference key="object" ref="797332558"/>
+						<reference key="parent" ref="31925181"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -1731,12 +1813,15 @@ wGw</bytes>
 				<string key="533.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="537.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="541.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="543.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="544.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="545.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 			</dictionary>
 			<dictionary class="NSMutableDictionary" key="unlocalizedProperties"/>
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">542</int>
+			<int key="maxID">548</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">

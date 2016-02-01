@@ -335,14 +335,14 @@ static PyGetSetDef pyDCMPix_getsetters[] =
 
 PyDoc_STRVAR(DCMPixComputeROI_doc,
 			 "\n"
-			 "Returns a tuple of statistics for the pixel values within a given ROI.\n"
+			 "Returns a dictionary of statistics for the pixel values within a given ROI.\n"
 			 "\n"
 			 "Args:\n"
 			 "    ROI: The ROI from within which to compute the image statistics.\n"
 			 "\n"
 			 "Returns:\n"
-			 "    tuple: The ROI statitics provided in the format\n"
-			 "           (mean, total, st. dev., min., max., skewness, kurtosis)\n"
+			 "    dict: A dictionary of ROI statistics with representative keys:\n"
+			 "           {'Mean', 'Total', 'Std. Dev.', 'Min.', 'Max.', 'Skewness', 'Kurtosis'}\n"
 			 );
 
 static PyObject *pyDCMPix_computeROI(pyDCMPixObject *self, PyObject *args)
@@ -362,15 +362,15 @@ static PyObject *pyDCMPix_computeROI(pyDCMPixObject *self, PyObject *args)
     DCMPix *pix = self->obj;
     float mean, total, dev, max, min, kurtosis, skewness;
     [pix computeROI:roi :&mean :&total :&dev :&min :&max :&skewness :&kurtosis];
-    PyObject *ret = PyTuple_New(7);
-    PyTuple_SetItem(ret, 0, PyFloat_FromDouble((double)mean));
-    PyTuple_SetItem(ret, 1, PyFloat_FromDouble((double)total));
-    PyTuple_SetItem(ret, 2, PyFloat_FromDouble((double)dev));
-    PyTuple_SetItem(ret, 3, PyFloat_FromDouble((double)min));
-    PyTuple_SetItem(ret, 4, PyFloat_FromDouble((double)max));
-    PyTuple_SetItem(ret, 5, PyFloat_FromDouble((double)skewness));
-    PyTuple_SetItem(ret, 6, PyFloat_FromDouble((double)kurtosis));
-    return ret;
+	PyObject *retDict = PyDict_New();
+	PyDict_SetItem(retDict, PyString_FromString("Mean"), PyFloat_FromDouble((double)mean));
+	PyDict_SetItem(retDict, PyString_FromString("Total"), PyFloat_FromDouble((double)total));
+	PyDict_SetItem(retDict, PyString_FromString("Std. Dev."), PyFloat_FromDouble((double)dev));
+	PyDict_SetItem(retDict, PyString_FromString("Minimum"), PyFloat_FromDouble((double)min));
+	PyDict_SetItem(retDict, PyString_FromString("Maximum"), PyFloat_FromDouble((double)max));
+	PyDict_SetItem(retDict, PyString_FromString("Skewness"), PyFloat_FromDouble((double)skewness));
+	PyDict_SetItem(retDict, PyString_FromString("Kurtosis"), PyFloat_FromDouble((double)kurtosis));
+    return retDict;
 }
 
 PyDoc_STRVAR(DCMPixGetROIValues_doc,
@@ -664,7 +664,7 @@ PyDoc_STRVAR(DCMPix_doc,
 			 "via functions defined in the ViewerContoller class\n"
 			 "\n"
 			 "Example Usage:\n"
-			 "    >>> import osirix"
+			 "    >>> import osirix\n"
 			 "    >>> vc = osirix.frontmostViewer()\n"
 			 "    >>> dcmPixList = vc.pixList(0)\n"
 			 "    >>> dcmPix = dcmPixLIst[0]\n"

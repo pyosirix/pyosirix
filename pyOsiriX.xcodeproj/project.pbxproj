@@ -73,6 +73,10 @@
 		052FB67E1C5EBBB90084E7B6 /* libpng16.16.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 052FB67D1C5EBBB90084E7B6 /* libpng16.16.dylib */; };
 		052FB67F1C5EBC240084E7B6 /* libpng16.16.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 052FB67D1C5EBBB90084E7B6 /* libpng16.16.dylib */; };
 		052FB6801C5EBC2B0084E7B6 /* Python.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 052FB67B1C5EBB9F0084E7B6 /* Python.framework */; };
+		052FB6851C5F83BA0084E7B6 /* POScriptWindowController.h in Headers */ = {isa = PBXBuildFile; fileRef = 052FB6831C5F83BA0084E7B6 /* POScriptWindowController.h */; };
+		052FB6861C5F83BA0084E7B6 /* POScriptWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 052FB6841C5F83BA0084E7B6 /* POScriptWindowController.m */; };
+		052FB6881C5F96CF0084E7B6 /* POScriptWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 052FB6871C5F96CF0084E7B6 /* POScriptWindow.xib */; };
+		052FB68B1C5FC2230084E7B6 /* pyROIVolume.h in Headers */ = {isa = PBXBuildFile; fileRef = 052FB6891C5FC2230084E7B6 /* pyROIVolume.h */; };
 		8420023212E829A200E1E9CE /* OsiriXAPI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8420023112E829A200E1E9CE /* OsiriXAPI.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		8D5B49AE048680CD000E48DA /* pyOsiriX_Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = 32DBCF630370AF2F00C91783 /* pyOsiriX_Prefix.pch */; };
 		8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
@@ -160,13 +164,18 @@
 		052FB6791C5D70AF0084E7B6 /* README.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
 		052FB67B1C5EBB9F0084E7B6 /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = Libraries/Python.framework; sourceTree = "<group>"; };
 		052FB67D1C5EBBB90084E7B6 /* libpng16.16.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpng16.16.dylib; path = Libraries/libpng16.16.dylib; sourceTree = "<group>"; };
+		052FB6811C5F07540084E7B6 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		052FB6831C5F83BA0084E7B6 /* POScriptWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = POScriptWindowController.h; sourceTree = "<group>"; };
+		052FB6841C5F83BA0084E7B6 /* POScriptWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = POScriptWindowController.m; sourceTree = "<group>"; };
+		052FB6871C5F96CF0084E7B6 /* POScriptWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = POScriptWindow.xib; sourceTree = "<group>"; };
+		052FB6891C5FC2230084E7B6 /* pyROIVolume.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = pyROIVolume.h; sourceTree = "<group>"; };
+		052FB68A1C5FC2230084E7B6 /* pyROIVolume.mm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = pyROIVolume.mm; sourceTree = "<group>"; };
 		089C1672FE841209C02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		089C167EFE841241C02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		089C167FFE841241C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		32DBCF630370AF2F00C91783 /* pyOsiriX_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pyOsiriX_Prefix.pch; sourceTree = "<group>"; };
 		8420023112E829A200E1E9CE /* OsiriXAPI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = OsiriXAPI.framework; sourceTree = "<group>"; };
-		8D5B49B7048680CD000E48DA /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AB5D36050680E57E00F4007A /* pyOsiriX.osirixplugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = pyOsiriX.osirixplugin; sourceTree = BUILT_PRODUCTS_DIR; };
 		ABA48A640680BB600089EB4F /* pyOsiriXFilter.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = pyOsiriXFilter.h; sourceTree = "<group>"; };
 		ABA48A660680BB690089EB4F /* pyOsiriXFilter.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = pyOsiriXFilter.m; sourceTree = "<group>"; };
@@ -197,20 +206,22 @@
 				0503ED891C5B74190091E9BD /* pyLog.m */,
 				0503ED8A1C5B74190091E9BD /* pyOsiriX.h */,
 				0503ED8B1C5B74190091E9BD /* pyOsiriX.m */,
-				0503ED8C1C5B74190091E9BD /* pyViewerController.h */,
-				0503ED8D1C5B74190091E9BD /* pyViewerController.m */,
 				0503ED8E1C5B74190091E9BD /* pyWait.h */,
 				0503ED8F1C5B74190091E9BD /* pyWait.m */,
 				0503ED901C5B74190091E9BD /* pyDCMPix.h */,
 				0503ED911C5B74190091E9BD /* pyDCMPix.m */,
 				0503ED921C5B74190091E9BD /* pyROI.h */,
 				0503ED931C5B74190091E9BD /* pyROI.m */,
+				052FB6891C5FC2230084E7B6 /* pyROIVolume.h */,
+				052FB68A1C5FC2230084E7B6 /* pyROIVolume.mm */,
 				0503ED941C5B74190091E9BD /* pyDicomImage.h */,
 				0503ED951C5B74190091E9BD /* pyDicomImage.m */,
 				0503ED961C5B74190091E9BD /* pyDicomSeries.h */,
 				0503ED971C5B74190091E9BD /* pyDicomSeries.m */,
 				0503ED981C5B74190091E9BD /* pyDicomStudy.h */,
 				0503ED991C5B74190091E9BD /* pyDicomStudy.m */,
+				0503ED8C1C5B74190091E9BD /* pyViewerController.h */,
+				0503ED8D1C5B74190091E9BD /* pyViewerController.m */,
 				0503ED9A1C5B74190091E9BD /* pyVRController.h */,
 				0503ED9B1C5B74190091E9BD /* pyVRController.m */,
 				0503ED9C1C5B74190091E9BD /* pyBrowserController.h */,
@@ -254,10 +265,11 @@
 				0503ED5F1C5B673C0091E9BD /* POLineFindWindow.xib */,
 				0503ED601C5B673C0091E9BD /* python-powered-h.pdf */,
 				0503ED621C5B673C0091E9BD /* POPackageWindow.xib */,
+				052FB6871C5F96CF0084E7B6 /* POScriptWindow.xib */,
 				052FB6791C5D70AF0084E7B6 /* README.txt */,
 				0503ED631C5B673C0091E9BD /* python.pdf */,
 				0503EDD21C5B76A10091E9BD /* python_osirixCol.pdf */,
-				8D5B49B7048680CD000E48DA /* Info.plist */,
+				052FB6811C5F07540084E7B6 /* Info.plist */,
 				089C167DFE841241C02AAC07 /* InfoPlist.strings */,
 			);
 			name = Resources;
@@ -324,6 +336,8 @@
 				0503EDC11C5B76060091E9BD /* POLogTextView.m */,
 				0503ED6B1C5B67810091E9BD /* POPackageWindowController.h */,
 				0503ED6C1C5B67810091E9BD /* POPackageWindowController.m */,
+				052FB6831C5F83BA0084E7B6 /* POScriptWindowController.h */,
+				052FB6841C5F83BA0084E7B6 /* POScriptWindowController.m */,
 				0503ED6F1C5B67DB0091E9BD /* POErrorCodes.h */,
 				0503ED721C5B67DB0091E9BD /* PORuntime.h */,
 				0503ED731C5B67DB0091E9BD /* PORuntime.m */,
@@ -348,6 +362,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				052FB6851C5F83BA0084E7B6 /* POScriptWindowController.h in Headers */,
 				0503EDA01C5B74190091E9BD /* pyLog.h in Headers */,
 				0503EDA41C5B74190091E9BD /* pyViewerController.h in Headers */,
 				0503EDCC1C5B76060091E9BD /* POLogTextView.h in Headers */,
@@ -375,6 +390,7 @@
 				0503EDC61C5B76060091E9BD /* POScriptView.h in Headers */,
 				0503EDAA1C5B74190091E9BD /* pyROI.h in Headers */,
 				0503EDA81C5B74190091E9BD /* pyDCMPix.h in Headers */,
+				052FB68B1C5FC2230084E7B6 /* pyROIVolume.h in Headers */,
 				0503ED9F1C5B74190091E9BD /* pyOsiriXModule.h in Headers */,
 				052FB6751C5D2C640084E7B6 /* POErrorAlertLog.h in Headers */,
 			);
@@ -438,6 +454,7 @@
 				0503ED641C5B673C0091E9BD /* pythonKeywords.plist in Resources */,
 				0503ED661C5B673C0091E9BD /* POLineFindWindow.xib in Resources */,
 				052FB67A1C5D70AF0084E7B6 /* README.txt in Resources */,
+				052FB6881C5F96CF0084E7B6 /* POScriptWindow.xib in Resources */,
 				0503ED651C5B673C0091E9BD /* pyOsiriXMenuItem.xib in Resources */,
 				0503ED6A1C5B673C0091E9BD /* python.pdf in Resources */,
 				0503EDD01C5B76400091E9BD /* POScriptEditorWindow.xib in Resources */,
@@ -489,6 +506,7 @@
 				0503EDAB1C5B74190091E9BD /* pyROI.m in Sources */,
 				0503EDCD1C5B76060091E9BD /* POLogTextView.m in Sources */,
 				0503EDC31C5B76060091E9BD /* POScriptEditorController.m in Sources */,
+				052FB6861C5F83BA0084E7B6 /* POScriptWindowController.m in Sources */,
 				0503EDB51C5B74190091E9BD /* pyBrowserController.m in Sources */,
 				0503ED801C5B67DB0091E9BD /* POScriptManager.m in Sources */,
 			);
@@ -511,6 +529,7 @@
 		CE6A9A9108AC841300D0C1EE /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LIBRARY = "libstdc++";
 				COPY_PHASE_STRIP = NO;
 				DEBUGGING_SYMBOLS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -561,6 +580,7 @@
 		CE6A9A9208AC841300D0C1EE /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LIBRARY = "libstdc++";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",

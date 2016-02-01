@@ -1,5 +1,5 @@
 //
-//  POScriptManager.h
+//  POScriptWindowController.h
 //  pyOsiriX
 //
 
@@ -35,43 +35,13 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class POScriptManager;
-
-NSString * const POScriptManagerErrorDomain;
-POScriptManager *scriptManager;
-
-@interface POScriptManager : NSObject
+@interface POScriptWindowController : NSWindowController <NSWindowDelegate, NSTableViewDataSource>
 {
-    BOOL managerReady;
-    NSArray *scriptHeaders;
+    IBOutlet NSTableView *table;
 }
 
-@property (readonly) BOOL managerReady;
-@property (readonly) NSArray *scriptHeaders;
-
-+ (NSString *) pluginDirectory;
-+ (NSString *)pathForScriptNamed: (NSString *)name;
-+ (NSURL *)urlForScriptNamed: (NSString *)name;
-+ (NSArray *)allowedTypes;
-+ (BOOL)typeAllowed:(NSString *)type;
-+ (NSString *)stringTemplateForType:(NSString *)type;
-
-- (BOOL) checkHeader:(NSString *)script headerInfo:(NSDictionary **)dict error:(NSError **)error;
-- (BOOL) installScriptFromURL:(NSURL *)url withError:(NSError **)error;
-- (BOOL) installScriptFromString:(NSString *)str withError:(NSError **)error;
-- (void) removeScriptsWithNames:(NSArray *)names;
-- (BOOL) removeScriptWithName:(NSString *)name;
-
-- (NSDictionary *) readHeaderInfoForScriptName:(NSString *)name;
-- (NSDictionary *) readHeaderInfoForScriptFile:(NSString *)file;
-- (NSDictionary *) readHeaderInfoForScriptURL:(NSURL *)url;
-
-- (BOOL)scriptPresentWithName:(NSString *)name;
-- (BOOL)scriptPresentWithName:(NSString *)name :(NSDictionary **)header;
-- (NSArray *) scriptNamesForType:(NSString *)type;
-- (NSString *)getScriptWithName:(NSString *)name;
-
-
-
+- (void)installScript;
+- (void)removeScript;
+- (IBAction)addRemovePath:(id)sender;
 
 @end

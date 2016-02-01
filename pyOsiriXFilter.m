@@ -42,7 +42,30 @@ static NSString * pythonToolbarItemIdentifier = @"pythonToolbarButton";
 NSString *const pluginName = @"pyOsiriX";
 BOOL pluginInitialised = NO;
 
+//TODO - This is a bit of a hack for now but seems to work
+
 BOOL runLoop;
+
+PyDoc_STRVAR(startRuntimeLoop_doc,
+			 "\n"
+			 "When running installed python scripts, this stops the python environment from terminating\n"
+			 "after the script file has been run.  This is required for scirpts that involve user feedback (e.g. matplotlib widgets).\n"
+			 "Note: You MUST call stopRuntimeLoop() after this function has been called.\n"
+			 "Not doing so will result in a hung python environment and you will need to use the\n"
+			 "\"Clean Python Environment\" feature of the pyOsiriX plugin from the plugins menu.\n"
+			 "This has no effect if the script is run from the Python file editor, but can be included for testing.\n"
+			 "\n"
+			 "Args:\n"
+			 "    None.\n"
+			 "\n"
+			 "Returns:\n"
+			 "    None.\n"
+			 "\n"
+			 "Example:\n"
+			 "    >>> startRuntimeLoop()\n"
+			 "    ...    operations that require user feedback to terminate the python runtime\n"
+			 "    >>> stopRuntimeLoop()\n"
+			 );
 
 PyObject * startRuntimeLoop()
 {
@@ -50,6 +73,24 @@ PyObject * startRuntimeLoop()
     Py_INCREF(Py_None);
     return Py_None;
 }
+
+PyDoc_STRVAR(stopRuntimeLoop_doc,
+			 "\n"
+			 "This terminates the call to startRuntimeLoop() and allows the python environment\n"
+			 "to clean itself so that it may be used again.\n"
+			"This has no effect if the script is run from the Python file editor, but can be included for testing.\n"
+			 "\n"
+			 "Args:\n"
+			 "    None.\n"
+			 "\n"
+			 "Returns:\n"
+			 "    None.\n"
+			 "\n"
+			 "Example:\n"
+			 "    >>> startRuntimeLoop()\n"
+			 "    ...    operations that require user feedback to terminate the python runtime\n"
+			 "    >>> stopRuntimeLoop()\n"
+			 );
 
 PyObject * stopRuntimeLoop()
 {
@@ -61,11 +102,9 @@ PyObject * stopRuntimeLoop()
     return Py_None;
 }
 
-PyMethodDef startLoopDef = {"startRuntimeLoop", (PyCFunction)startRuntimeLoop, METH_NOARGS, ""};
+PyMethodDef startLoopDef = {"startRuntimeLoop", (PyCFunction)startRuntimeLoop, METH_NOARGS, startRuntimeLoop_doc};
 
-PyMethodDef stopLoopDef = {"stopRuntimeLoop", (PyCFunction)stopRuntimeLoop, METH_NOARGS, ""};
-
-//TODO The above should be moved to PORuntime
+PyMethodDef stopLoopDef = {"stopRuntimeLoop", (PyCFunction)stopRuntimeLoop, METH_NOARGS, stopRuntimeLoop_doc};
 
 @implementation pyOsiriXFilter
 
@@ -83,18 +122,19 @@ PyMethodDef stopLoopDef = {"stopRuntimeLoop", (PyCFunction)stopRuntimeLoop, METH
     scriptManager = [[POScriptManager alloc] init]; //For now this does nothing
 }
 
--(void)scriptWindowWillClose:(NSNotification *)note
+-(void)scriptEditorWindowWillClose:(NSNotification *)note
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSWindowWillCloseNotification object:[scriptController window]];
-    [scriptController release];
-    scriptController = nil;
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSWindowWillCloseNotification object:[scriptEditorController window]];
+    [scriptEditorController release];
+	[pyRuntime endPythonEnvironment];
+    scriptEditorController = nil;
 }
 
 -(void) startPythonTerminal
 {
-    if (scriptController) {
+    if (scriptEditorController) {
         //Put in front
-        [[scriptController window] makeKeyAndOrderFront:self];
+        [[scriptEditorController window] makeKeyAndOrderFront:self];
         return;
     }
     
@@ -105,7 +145,7 @@ PyMethodDef stopLoopDef = {"stopRuntimeLoop", (PyCFunction)stopRuntimeLoop, METH
     
     // Load and Run the window
     // Make sure we listen for when it closes!!
-    scriptController = [[POScriptEditorController alloc] initWithWindowNibName:POScriptEditorNIBName];
+    scriptEditorController = [[POScriptEditorController alloc] initWithWindowNibName:POScriptEditorNIBName];
     
     PyObject *pyStartLoopFunc = PyCFunction_New(&startLoopDef, NULL);
     PyObject *pyStopLoopFunc = PyCFunction_New(&stopLoopDef, NULL);
@@ -115,15 +155,15 @@ PyMethodDef stopLoopDef = {"stopRuntimeLoop", (PyCFunction)stopRuntimeLoop, METH
     Py_DECREF(pyStopLoopFunc);
     Py_DECREF(pyStartLoopFunc);
     
-    if (scriptController) {
+    if (scriptEditorController) {
         NSRect scrSize = [[NSScreen mainScreen] frame];
         scrSize.origin.y += 0.4*scrSize.size.height;
         scrSize.size.height *= 0.6;
         scrSize.size.width *= 0.5;
-        [[scriptController window] setFrame:scrSize display:YES];
-        [scriptController showWindow:self];
-        [[scriptController window] makeKeyAndOrderFront:self];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(scriptWindowWillClose:) name: NSWindowWillCloseNotification object:[scriptController window]];
+        [[scriptEditorController window] setFrame:scrSize display:YES];
+        [scriptEditorController showWindow:self];
+        [[scriptEditorController window] makeKeyAndOrderFront:self];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(scriptEditorWindowWillClose:) name: NSWindowWillCloseNotification object:[scriptEditorController window]];
     }
 }
 
@@ -137,7 +177,7 @@ PyMethodDef stopLoopDef = {"stopRuntimeLoop", (PyCFunction)stopRuntimeLoop, METH
     NSString *name = [item title];
     NSString *script = [scriptManager getScriptWithName:name];
     if (script == nil) {
-        NSRunAlertPanel(pluginName, @"Could not run the specified script. \rPlease report this error.", @"OK", nil, nil);
+        NSRunAlertPanel(pluginName, @"Could not find the specified script, it may no longer exist. \rPlease restart OsiriX.", @"OK", nil, nil);
         return;
     }
     
@@ -372,6 +412,13 @@ PyMethodDef stopLoopDef = {"stopRuntimeLoop", (PyCFunction)stopRuntimeLoop, METH
     packageController = nil;
 }
 
+- (void)scriptWindowWillClose:(NSNotification *)note
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSWindowWillCloseNotification object:[scriptWindowController window]];
+    [scriptWindowController release];
+    scriptWindowController = nil;
+}
+
 - (void)runPackageManager
 {
     if (packageController) {
@@ -384,14 +431,36 @@ PyMethodDef stopLoopDef = {"stopRuntimeLoop", (PyCFunction)stopRuntimeLoop, METH
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(packageWindowWillClose:) name: NSWindowWillCloseNotification object:[packageController window]];
 }
 
+- (void)runScriptManager
+{
+	if (scriptWindowController) {
+        [[scriptWindowController window] makeKeyAndOrderFront:nil];
+        return;
+    }
+    scriptWindowController = [[POScriptWindowController alloc] initWithWindowNibName:@"POScriptWindow"];
+    [scriptWindowController showWindow:self];
+    [[scriptWindowController window] makeKeyAndOrderFront:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(scriptWindowWillClose:) name: NSWindowWillCloseNotification object:[scriptWindowController window]];
+}
+
 - (long) filterImage:(NSString*) menuName
 {
     if ([menuName isEqualToString:@"Start Terminal"]) {
         [self startPythonTerminal];
     }
-    else {
+	else if ([menuName isEqualToString:@"Script Manager"])
+	{
+		[self runScriptManager];
+	}
+    else if ([menuName isEqualToString:@"Package Manager"]){
         [self runPackageManager];
     }
+	else{
+		if ([pyRuntime runtimeActive]) {
+			[pyRuntime endPythonEnvironment];
+			runLoop = NO;
+		}
+	}
     return 0;
 }
 

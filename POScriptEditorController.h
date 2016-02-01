@@ -51,8 +51,6 @@ extern NSString *POScriptEditorNIBName;
 	
 	NSString *currFilePath;
 	NSTextFinder *textFinder;
-	
-	PORuntime *runtime;
 }
 
 - (IBAction)saveCurrentTextAs:(id)sender;
@@ -70,7 +68,5 @@ extern NSString *POScriptEditorNIBName;
 - (IBAction)undentSelection:(id)sender;
 
 @property (retain) NSString * currFilePath;
-
-@property (retain) PORuntime *runtime;
 
 @end

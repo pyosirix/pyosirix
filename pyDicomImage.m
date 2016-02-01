@@ -39,7 +39,7 @@
 #include <Python/datetime.h>
 
 # pragma mark -
-# pragma mark pyDicomImage initialization/deallocation
+# pragma mark pyDicomImageObject initialization/deallocation
 
 static void pyDicomImage_dealloc(pyDicomImageObject *self)
 {
@@ -48,7 +48,7 @@ static void pyDicomImage_dealloc(pyDicomImageObject *self)
 }
 
 # pragma mark -
-# pragma mark pyDCMPixObject str/repr
+# pragma mark pyDicomImageObject str/repr
 
 static PyObject *pyDicomImage_str(pyDicomImageObject *self)
 {
@@ -62,7 +62,7 @@ static PyObject *pyDicomImage_str(pyDicomImageObject *self)
 }
 
 # pragma mark -
-# pragma mark pyViewerControllerObject getters/setters
+# pragma mark pyDicomImageObject getters/setters
 
 PyDoc_STRVAR(DicomImageDateAttr_doc,
 			 "The date of image acquisition. This property cannot be set.\n"
@@ -138,7 +138,7 @@ static PyGetSetDef pyDicomImage_getsetters[] =
 };
 
 # pragma mark -
-# pragma mark pyViewerControllerObject methods
+# pragma mark pyDicomImageObject methods
 
 PyDoc_STRVAR(DicomImageWidth_doc,
 			 "\n"

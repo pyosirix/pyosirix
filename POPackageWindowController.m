@@ -37,8 +37,6 @@
 #import "POPackageManager.h"
 #import "PORuntime.h"
 
-NSString *closePythonPackageWindowNotification = @"closePythonPackageWindowNotification";
-
 @implementation POPackageWindowController
 
 - (id)initWithWindow:(NSWindow *)window
@@ -57,11 +55,6 @@ NSString *closePythonPackageWindowNotification = @"closePythonPackageWindowNotif
     // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
 }
 
-- (void) windowWillClose:(NSNotification *)notification
-{
-    [[NSNotificationCenter defaultCenter] postNotificationName:closePythonPackageWindowNotification object:self];
-}
-
 - (void)addPath
 {
     NSOpenPanel *oP = [[NSOpenPanel alloc] init];
@@ -74,7 +67,16 @@ NSString *closePythonPackageWindowNotification = @"closePythonPackageWindowNotif
     if (ans != NSFileHandlingPanelOKButton) {
         return;
     }
-    NSString *dir = [[oP URL] path];
+	NSURL *url = [oP URL];
+	if (!url) {
+		url = [oP directoryURL];
+	}
+	if (!url) {
+		return;
+	}
+    NSString *dir = [url path];
+	[oP close];
+	[oP release];
     POPackageManager *ppm = [POPackageManager packageManager];
     for (NSString *package in [ppm getUserPackages]) {
         if ([package isEqualToString:dir]) {

@@ -61,7 +61,6 @@ NSString * const pythonUserPackagesDefaultKey = @"com.InstituteOfCancerResearch.
             [NSString stringWithFormat:@"%@%@", homeStr, @"lib/python2.7/lib-dynload"],
             [NSString stringWithFormat:@"%@%@", homeStr, @"lib/python2.7/site-packages"],
             [NSString stringWithFormat:@"%@%@", homeStr, @"lib/python2.7/site-packages/matplotlib-1.4.3-py2.7-macosx-10.5-intel.egg"],
-            [NSString stringWithFormat:@"%@%@", homeStr, @"lib/python2.7/site-packages/PIL"],
                     nil];
     
     return arr;

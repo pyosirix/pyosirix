@@ -36,6 +36,7 @@
 #import "POScriptEditorController.h"
 #import "pyOsiriXFilter.h"
 #import "PORulerView.h"
+#import <OsiriXAPI/Notifications.h>
 
 #define FILE_SAVE_CONTEXT @"file_save_context"
 
@@ -43,7 +44,7 @@ NSString *POScriptEditorNIBName = @"POScriptEditorWindow";
 
 @implementation POScriptEditorController
 
-@synthesize currFilePath, runtime;
+@synthesize currFilePath;
 
 + (NSInteger)alertWithMessageText:(NSString *)message :(NSString *)firstButton :(NSString *)secondButton :(NSString *)thirdButton :(NSString *)informativeTextWithFormat, ...
 {
@@ -159,11 +160,6 @@ NSString *POScriptEditorNIBName = @"POScriptEditorWindow";
 	[[self window] setDocumentEdited:YES];
 }
 
-- (void)shouldTerminateCallback:(NSTimer *)t
-{
-	[[NSApplication sharedApplication] stopModalWithCode: NSAlertSecondButtonReturn];
-}
-
 - (void)osirixWillClose:(NSNotification *)note
 {
 	if([[self window] isDocumentEdited])
@@ -178,23 +174,6 @@ NSString *POScriptEditorNIBName = @"POScriptEditorWindow";
 			[self saveCurrentText:self];
 		}
 	}
-}
-
-- (id)initWithWindowNibName:(NSString *)windowNibName
-{
-	self = [super initWithWindowNibName:windowNibName];
-	if (!self)
-		return nil;
-	runtime = nil;
-	return self;
-}
-
-- (void)dealloc
-{
-	if (runtime) {
-		[runtime release];
-	}
-	[super dealloc];
 }
 
 - (void)windowDidLoad
@@ -218,6 +197,16 @@ NSString *POScriptEditorNIBName = @"POScriptEditorWindow";
 	[pythonInput setUsesFindBar:YES];
 	[pythonInput setIncrementalSearchingEnabled:YES];
 	[sV setFindBarPosition:NSScrollViewFindBarPositionBelowContent];
+	
+	[pythonLogView setEditable:FALSE];
+    [pythonLogView setRichText: NO];
+    [pythonInput setRichText: NO];
+    [pythonInput setAutomaticQuoteSubstitutionEnabled:NO];
+    [pythonInput setAutomaticSpellingCorrectionEnabled:NO];
+    [pythonInput setAutomaticTextReplacementEnabled:NO];
+    [pythonInput setAutomaticLinkDetectionEnabled:NO];
+    [pythonLogView setFont: [NSFont fontWithName: @"Monaco" size: 12]];
+    [pythonInput setFont: [NSFont fontWithName: @"Monaco" size: 12]];
 	
 	PORulerView *rv = [[PORulerView alloc] initWithScrollView:sV orientation:NSVerticalRuler textView:pythonInput];
 	[sV setVerticalRulerView:rv];
@@ -328,7 +317,7 @@ NSString *POScriptEditorNIBName = @"POScriptEditorWindow";
 
 - (IBAction)displayInfo:(id)sender
 {
-	NSRunAlertPanel(pluginName, @"This tool is not FDA approved!", @"OK", nil, nil);
+	[POScriptEditorController alertWithMessageText:pluginName :@"OK" :nil :nil :@"This plugin is not FDA approved nor CE marked.\nPlease use with caution!\nFor more info run 'help(osirix)' in the pyOsiriX terminal or see our website:\nhttps://sites.google.com/site/pyosirix/"];
 }
 
 - (IBAction)installScript:(id)sender
@@ -337,19 +326,21 @@ NSString *POScriptEditorNIBName = @"POScriptEditorWindow";
     NSError *err;
     BOOL ok = [scriptManager installScriptFromString:script withError:&err];
     if (!ok) {
-        NSRunAlertPanel(pluginName, @"%@\r%@", @"OK", nil, nil, [[err userInfo] valueForKey:NSLocalizedDescriptionKey], [[err userInfo] valueForKey:NSLocalizedFailureReasonErrorKey]);
+		[POScriptEditorController alertWithMessageText:pluginName :@"OK" :nil :nil :@"%@\r%@", [[err userInfo] valueForKey:NSLocalizedDescriptionKey], [[err userInfo] valueForKey:NSLocalizedFailureReasonErrorKey]];
         return;
     }
+	else {
     NSDictionary *dict;
     [scriptManager checkHeader:script headerInfo:&dict error:&err];
-    NSRunAlertPanel(pluginName, @"Script %@ scuccessfully installed.\rPlease restart OsiriX to complete before using this ", @"OK", nil, nil, [dict valueForKey:@"name"]);
+	[POScriptEditorController alertWithMessageText:pluginName :@"OK" :nil :nil :@"Script %@ scuccessfully installed.\rPlease restart OsiriX to use.", [dict valueForKey:@"name"]];
+	}
 }
 
 - (IBAction)addTemplate:(id)sender
 {
 	if (![[pythonInput string] isEqualToString:@""]) {
-        int response = NSRunAlertPanel(pluginName, @"Text is already loaded.  Are you sure you want to remove?", @"OK", @"Cancel", nil);
-        if (response == NSAlertAlternateReturn) {
+        NSInteger response = [POScriptEditorController alertWithMessageText:pluginName :@"OK" :@"Cancel" :nil :@"Text is already loaded.  Are you sure you want to remove?"];
+        if (response == NSAlertSecondButtonReturn) {
             return;
         }
     }

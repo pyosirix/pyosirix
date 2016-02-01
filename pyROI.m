@@ -41,6 +41,9 @@
 #import "pyDCMPix.h"
 #import "pyOsiriX.h"
 
+# pragma mark -
+# pragma mark pyROIObject initialization/deallocation
+
 static void pyROI_dealloc(pyROIObject *self)
 {
     [self->obj release];
@@ -64,7 +67,7 @@ void init_numpy_ROI()
 static int pyROI_init(pyROIObject *self, PyObject *args, PyObject *kwds)
 {
     //Make sure user has supplied a type, then we can decide what to do with it!
-    static char *kwlist[] = {"itype", "buffer", "position", "DCMPix", "name", "ipixelSpacing", "iimageorigin", "addToDCMPix", NULL};
+    static char *kwlist[] = {"itype", "buffer", "position", "DCMPix", "name", "ipixelSpacing", "iimageOrigin", NULL};
     
     char * roiType = "tCPolygon";
     float iSpx = 1.0;
@@ -72,14 +75,13 @@ static int pyROI_init(pyROIObject *self, PyObject *args, PyObject *kwds)
     float iOrx = 0.0;
     float iOry = 0.0;
     PyObject *dcmRef = NULL;
-    int addToDCM = 0;
     char *name = "Un-named ROI";
     PyObject *buffer = NULL;
     int posX = 0;
     int posY = 0;
     
     init_numpy_ROI();
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|sO!(ii)O!s(ff)(ff)d", kwlist, &roiType, &PyArray_Type, &buffer, &posX, &posY, &pyDCMPixType, &dcmRef, &name, &iSpx, &iSpy, &iOrx, &iOry, &addToDCM))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|sO!(ii)O!s(ff)(ff)", kwlist, &roiType, &PyArray_Type, &buffer, &posX, &posY, &pyDCMPixType, &dcmRef, &name, &iSpx, &iSpy, &iOrx, &iOry))
     {
         pyOsiriXLog("Could not instantiate the ROI instance");
         return -1;
@@ -158,23 +160,49 @@ static int pyROI_init(pyROIObject *self, PyObject *args, PyObject *kwds)
         [self->obj setName:[NSString stringWithUTF8String:name]];
     }
     
-    if (dcmRef && addToDCM != 0) {
-        DCMPix *pix = ((pyDCMPixObject *)dcmRef)->obj;
-        [self->obj setPix:pix];
-    }
     return 0;
 }
+
+# pragma mark -
+# pragma mark pyROIObject str/repr
+
+static PyObject *pyROI_str(pyROIObject *self)
+{
+	NSString *str = [NSString stringWithFormat:@"ROI object (Name: %@)\n", [self->obj name]];
+	PyObject *ostr = PyString_FromString([str UTF8String]);
+	if (ostr == NULL) {
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+	return ostr;
+}
+
+# pragma mark -
+# pragma mark pyROIObject getters/setters
+
+PyDoc_STRVAR(ROITypeAttr_doc,
+			 "A string representing the ROI type.\n"
+			 "This property cannot be set.\n"
+			 );
 
 static PyObject *pyROI_getType(pyROIObject *self, void *closure)
 {
     ROI *roi = self->obj;
     long t = [roi type];
-    NSDictionary *roiTypesDictionary = [pyROI toolsDictionary];
-    NSArray *typeKeys = [roiTypesDictionary allKeys];
-    NSString *key = [typeKeys objectAtIndex:t];
-    PyObject *pyStr = PyString_FromString([key UTF8String]);
+    NSString *type = [pyROI toolTypeDescriptionForNumber:[NSNumber numberWithLong:t]];
+	PyObject *pyStr;
+	if (type != nil)
+		pyStr = PyString_FromString([type UTF8String]);
+	else {
+		Py_INCREF(Py_None);
+		pyStr = Py_None;
+	}
     return pyStr;
 }
+
+PyDoc_STRVAR(ROIThicknessAttr_doc,
+			 "A float value for the thickness of the ROI.\n"
+			 );
 
 static PyObject *pyROI_getThickness(pyROIObject *self, void *closure)
 {
@@ -191,6 +219,11 @@ static int pyROI_setThickness(pyROIObject *self, PyObject *value, void *closure)
     [self->obj setThickness:(float)PyFloat_AsDouble(value)];
     return 0;
 }
+
+PyDoc_STRVAR(ROIOpacityAttr_doc,
+			 "A float value for the opacity of the ROI.\n"
+			 "Must be within the range 0.0 -> 1.0.\n"
+			 );
 
 static PyObject *pyROI_getOpacity(pyROIObject *self, void *closure)
 {
@@ -210,6 +243,11 @@ static int pyROI_setOpacity(pyROIObject *self, PyObject *value, void *closure)
     [self->obj setOpacity:op];
     return 0;
 }
+
+PyDoc_STRVAR(ROIColorAttr_doc,
+			 "A three element (R, G, B) tuple representing the ROI color.\n"
+			 "Each element must be an integer in the range 0 -> 255.\n"
+			 );
 
 static PyObject *pyROI_getColor(pyROIObject *self, void *closure)
 {
@@ -264,6 +302,10 @@ static int pyROI_setColor(pyROIObject *self, PyObject *value, void *closure)
     return 0;
 }
 
+PyDoc_STRVAR(ROINameAttr_doc,
+			 "A string representing the name of the ROI.\n"
+			 );
+
 static PyObject *pyROI_getName(pyROIObject *self, void *closure)
 {
     NSString *name = [self->obj name];
@@ -283,12 +325,22 @@ static int pyROI_setName(pyROIObject *self, PyObject *value, void *closure)
     return 0;
 }
 
+PyDoc_STRVAR(ROIPixAttr_doc,
+			 "The DCMPix instance associated with the ROI.\n"
+			 "This property cannot be set.\n"
+			 );
+
 static PyObject *pyROI_getPix(pyROIObject *self, void *closure)
 {
     DCMPix *pix = [self->obj pix];
     PyObject *pyPix = [pyDCMPix pythonObjectWithInstance:pix];
     return pyPix;
 }
+
+PyDoc_STRVAR(ROIPointsAttr_doc,
+			 "A numpy float array with shape [N, 2] for N points in the ROI.\n"
+			 "Setting this property fro some ROI types result in a no-op.\n"
+			 );
 
 static int pyROI_setPoints(pyROIObject *self, PyObject *value, void *closure)
 {
@@ -352,15 +404,30 @@ static PyObject *pyROI_getPoints(pyROIObject *self, void *closure)
 
 static PyGetSetDef pyROI_getsetters[] =
 {
-    {"type", (getter)pyROI_getType, NULL, "The type of ROI", NULL},
-    {"thickness", (getter)pyROI_getThickness, (setter)pyROI_setThickness, "The thickness of the ROI", NULL},
-    {"opacity", (getter)pyROI_getOpacity, (setter)pyROI_setOpacity, "The opacity of the ROI", NULL},
-    {"color", (getter)pyROI_getColor, (setter)pyROI_setColor, "The color of the ROI", NULL},
-    {"name", (getter)pyROI_getName, (setter)pyROI_setName, "The name of the ROI", NULL},
-    {"pix", (getter)pyROI_getPix, NULL, "The pix object in which the ROI is contained", NULL},
-    {"points", (getter)pyROI_getPoints, (setter)pyROI_setPoints, "A list of Nx2 points describing the ROI", NULL},
+    {"type", (getter)pyROI_getType, NULL, ROITypeAttr_doc, NULL},
+    {"thickness", (getter)pyROI_getThickness, (setter)pyROI_setThickness, ROIThicknessAttr_doc, NULL},
+    {"opacity", (getter)pyROI_getOpacity, (setter)pyROI_setOpacity, ROIOpacityAttr_doc, NULL},
+    {"color", (getter)pyROI_getColor, (setter)pyROI_setColor, ROIColorAttr_doc, NULL},
+    {"name", (getter)pyROI_getName, (setter)pyROI_setName, ROINameAttr_doc, NULL},
+    {"pix", (getter)pyROI_getPix, NULL, ROIPixAttr_doc, NULL},
+    {"points", (getter)pyROI_getPoints, (setter)pyROI_setPoints, ROIPointsAttr_doc, NULL},
     {NULL}
 };
+
+# pragma mark -
+# pragma mark pyROIObject methods
+
+PyDoc_STRVAR(ROICentroid_doc,
+			 "\n"
+			 "Returns a two-element tuple representing the centroid of the ROI.\n"
+			 "\n"
+			 "Args:\n"
+			 "    None.\n"
+			 "\n"
+			 "Returns:\n"
+			 "    tuple: A 2-element tuple representing the ROI centroid in the form: \n"
+			 "           (rows, columns)\n"
+			 );
 
 static PyObject *pyROI_centroid(pyROIObject *self)
 {
@@ -370,6 +437,25 @@ static PyObject *pyROI_centroid(pyROIObject *self)
     PyTuple_SetItem(pyPt, 1, PyFloat_FromDouble((double)pt.y));
     return pyPt;
 }
+
+PyDoc_STRVAR(ROIMove_doc,
+			 "\n"
+			 "Move the ROI by a specified number of pixels in the image plane.\n"
+			 "\n"
+			 "Args:\n"
+			 "    c (float): The number of columns to move the ROI.  Positive values move left -> right.\n"
+			 "    r (float): The number of rows to move the ROI.  Positive values move up -> down.\n"
+			 "\n"
+			 "Returns:\n"
+			 "    None.\n"
+			 "\n"
+			 "Example:\n"
+			 "    >>> import osirix\n"
+			 "    >>> vc = osirix.frontmostViewer()\n"
+			 "    >>> selectedROI = vc.selectedROIs()[0]\n"
+			 "    >>> selectedROI.moveROI(1.0, 1.0)\n"
+			 "    >>> vc.needsDisplayUpdate()\n"
+			 );
 
 static PyObject *pyROI_roiMove(pyROIObject *self, PyObject *args)
 {
@@ -385,6 +471,28 @@ static PyObject *pyROI_roiMove(pyROIObject *self, PyObject *args)
     return Py_None;
 }
 
+PyDoc_STRVAR(ROIRotate_doc,
+			 "\n"
+			 "Rotate the ROI by a specified angle about a point (x, y) in the image plane.\n"
+			 "Note: This method is a no-op for brush ROIs.\n"
+			 "\n"
+			 "Args:\n"
+			 "    theta (float): The angle (in degrees) by which to rotate the ROI.\n"
+			 "    pt (tuple): A 2-element tuple of float values representing the point about which to rotate the ROI.\n"
+			 "                The order of the tuple should be (columns, rows).\n"
+			 "\n"
+			 "Returns:\n"
+			 "    None.\n"
+			 "\n"
+			 "Example:\n"
+			 "    >>> import osirix\n"
+			 "    >>> vc = osirix.frontmostViewer()\n"
+			 "    >>> selectedROI = vc.selectedROIs()[0]\n"
+			 "    >>> c = selectedROI.centroid()\n"
+			 "    >>> selectedROI.rotate(90.0, c) #Rotate an ROI 90 degrees about its center of mass\n"
+			 "    >>> vc.needsDisplayUpdate()\n"
+			 );
+
 static PyObject *pyROI_rotate(pyROIObject *self, PyObject *args)
 {
     NSPoint pt;
@@ -399,6 +507,18 @@ static PyObject *pyROI_rotate(pyROIObject *self, PyObject *args)
     return Py_None;
 }
 
+PyDoc_STRVAR(ROIFlipVertically_doc,
+			 "\n"
+			 "Flip the ROI vertically.\n"
+			 "Note: This method is a no-op for brush ROIs.\n"
+			 "\n"
+			 "Args:\n"
+			 "    None.\n"
+			 "\n"
+			 "Returns:\n"
+			 "    None.\n"
+			 );
+
 static PyObject *pyROI_flipVertically(pyROIObject *self)
 {
     [self->obj flipVertically:YES];
@@ -406,12 +526,35 @@ static PyObject *pyROI_flipVertically(pyROIObject *self)
     return Py_None;
 }
 
+PyDoc_STRVAR(ROIFlipHorizontally_doc,
+			 "\n"
+			 "Flip the ROI horizontally.\n"
+			 "Note: This method is a no-op for brush ROIs.\n"
+			 "\n"
+			 "Args:\n"
+			 "    None.\n"
+			 "\n"
+			 "Returns:\n"
+			 "    None.\n"
+			 );
+
 static PyObject *pyROI_flipHorizontally(pyROIObject *self)
 {
     [self->obj flipVertically:NO];
     Py_INCREF(Py_None);
     return Py_None;
 }
+
+PyDoc_STRVAR(ROIArea_doc,
+			 "\n"
+			 "Return the area with the ROI.\n"
+			 "\n"
+			 "Args:\n"
+			 "    None.\n"
+			 "\n"
+			 "Returns:\n"
+			 "    float: The area within the ROI in units of cm^2.\n"
+			 );
 
 static PyObject *pyROI_roiArea(pyROIObject *self)
 {
@@ -422,14 +565,50 @@ static PyObject *pyROI_roiArea(pyROIObject *self)
 
 static PyMethodDef pyROIMethods[] =
 {
-    {"centroid", (PyCFunction)pyROI_centroid, METH_NOARGS, "Return the centroid of an ROI as a tuple in the format (x, y)"},
-    {"roiMove", (PyCFunction)pyROI_roiMove, METH_VARARGS, "Move the ROI by distance x to the right and y upwards.  Usage: roi.roiMove(x, y)"},
-    {"rotate", (PyCFunction)pyROI_rotate, METH_VARARGS, "Retate an ROI by specified amount t about point tuple (x,y).  Usage: roi.rotate(t, (x,y))"},
-    {"flipVertically", (PyCFunction)pyROI_flipVertically, METH_NOARGS, "Flip the ROI vertically"},
-    {"flipHorizontally", (PyCFunction)pyROI_flipHorizontally, METH_NOARGS, "Flip the ROI horizontally"},
-    {"roiArea", (PyCFunction)pyROI_roiArea, METH_NOARGS, "Get the area of the ROI in unit of cm^2"},
+    {"centroid", (PyCFunction)pyROI_centroid, METH_NOARGS, ROICentroid_doc},
+    {"roiMove", (PyCFunction)pyROI_roiMove, METH_VARARGS, ROIMove_doc},
+    {"rotate", (PyCFunction)pyROI_rotate, METH_VARARGS, ROIRotate_doc},
+    {"flipVertically", (PyCFunction)pyROI_flipVertically, METH_NOARGS, ROIFlipVertically_doc},
+    {"flipHorizontally", (PyCFunction)pyROI_flipHorizontally, METH_NOARGS, ROIFlipHorizontally_doc},
+    {"roiArea", (PyCFunction)pyROI_roiArea, METH_NOARGS, ROIArea_doc},
     {NULL}
 };
+
+# pragma mark -
+# pragma mark pyROIType definition
+
+PyDoc_STRVAR(ROI_doc,
+			 "A python implementation of the OsiriX 'ROI' class.\n"
+			 "Instances of this class can be created with the following signature:\n"
+			 "    osirix.ROI(*args)\n"
+			 "\n"
+			 "Args:\n"
+			 "    itype (Optional[str]): The type of ROI to create.  Currently can only be none of\n"
+			 "           tPlain, tCPolygon (default), tOPolygon, tPencil.\n"
+			 "    buffer (npy_array): A 2D numpy boolean array representing pixels contained with the ROI.\n"
+			 "            This keyword is required if ROI type is tPlain and must not be specified otherwise.\n"
+			 "    origin (Optional[tuple]): The position of the top-left most pixel of the ROI buffer.\n"
+			 "    DCMPix (Optional[DCMPix]): A DCMPix instance from which to extract tha arguments ipixelSpacing \n"
+			 "                               and iimageOrigin.\n"
+			 "    name (Optional[str]): The name of the ROI (defaults to \"Un-named ROI\").\n"
+			 "    ipixelSpacing (Optional[tuple]): A 2-element tuple, (x, y), with the pixel spacing of the image \n"
+			 "                                     to which the ROI will be associated. Ignored if DCMPix is set.\n"
+			 "    iimageOrigin (Optional[tuple]): A 2-element tuple, (x, y), with the position of the top-left image pixel\n"
+			 "                                     to which the ROI will be associated. Ignored if DCMPix is set.\n"
+			 "\n"
+			 "Example Usage:\n"
+			 "    >>> import osirix\n"
+			 "    >>> import numpy as np\n"
+			 "    >>> vc = osirix.frontmostViewer()\n"
+			 "    >>> pix = vc.curDCM()\n"
+			 "    >>> newROI = osirix.ROI(itype = \"tPencil\", name = \"square-ish ROI\")\n"
+			 "    >>> newROI.points = np.array([[10.0, 10.0], [20.0, 10.0], [20.0, 20.0], [10.0, 20.0]])\n"
+			 "    >>> newROI.thickness = 4.0\n"
+			 "    >>> newROI.color = (255, 0, 255)\n"
+			 "    >>> newROI.opacity = 0.7\n"
+			 "    >>> vc.setROI(newROI)\n"
+			 "    >>> vc.needsDisplayUpdate()\n"
+			 );
 
 PyTypeObject pyROIType =
 {
@@ -449,12 +628,12 @@ PyTypeObject pyROIType =
     0,
     0,
     0,
-    0,
+    (reprfunc)pyROI_str,
     0,
     0,
     0,
     Py_TPFLAGS_DEFAULT,
-    "ROI objects",
+    ROI_doc,
     0,
     0,
     0,
@@ -473,6 +652,9 @@ PyTypeObject pyROIType =
     0,
     pyROI_new,
 };
+
+# pragma mark -
+# pragma mark pyROI implementation
 
 @implementation pyROI
 
@@ -519,6 +701,18 @@ PyTypeObject pyROIType =
                           [NSNumber numberWithInt:tDynAngle],@"tDynAngle",
                           [NSNumber numberWithInt:tCurvedROI],@"tCurvedROI",
                           nil];
+}
+
++ (NSString *)toolTypeDescriptionForNumber:(NSNumber *)num
+{
+	NSDictionary *roiTypes = [pyROI toolsDictionary];
+	NSArray *keys = [roiTypes allKeys];
+	for (NSString *key in keys) {
+		if ([[roiTypes valueForKey:key] isEqualToNumber:num]) {
+			return key;
+		}
+	}
+	return nil;
 }
 
 + (PyObject *)pythonObjectWithInstance:(id)obj

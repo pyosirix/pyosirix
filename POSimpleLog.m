@@ -47,7 +47,7 @@
 
 - (void) logAppendString:(NSString *)str
 {
-    NSLog(@"%@", str); //This will simply log the python error to standard console (Utilities->Console)
+    NSLog(@"pyOsiriX: %@", str); //This will simply log the python error to standard console (Utilities->Console)
 }
 
 @end

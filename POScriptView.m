@@ -194,6 +194,7 @@
 - (void)setString:(NSString *)string
 {
 	[super setString:string];
+	rangeOfTextToBeInsterted = NSMakeRange(0, [string length]);
 	[self didChangeText];
 }
 
@@ -657,15 +658,21 @@
 				if (end < [content length])
 				{
 					unichar nextChar = [content characterAtIndex:end];
-					if (nextChar == 'x')
+					if (nextChar == 'x' || nextChar == 'X')
+					{
 						hexFound = YES;
-					else if (nextChar == 'b')
+						end++;
+					}
+					else if (nextChar == 'b' || nextChar == 'B')
+					{
 						binaryFound = YES;
-					else if (nextChar == '.')
-						dotFound = YES;
-					else
+						end++;
+					}
+					else if (nextChar == 'o' || nextChar == 'O')
+					{
 						octFound = YES;
-					end++;
+						end++;
+					}
 				}
 			}
 			

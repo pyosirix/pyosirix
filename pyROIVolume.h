@@ -1,5 +1,5 @@
 //
-//  POScriptManager.h
+//  pyROIVolume.h
 //  pyOsiriX
 //
 
@@ -33,45 +33,22 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Cocoa/Cocoa.h>
+#include <Python/Python.h>
+#import <Foundation/Foundation.h>
+#import "pyOsiriXType.h"
 
-@class POScriptManager;
+PyAPI_DATA(PyTypeObject) pyROIVolumeType;
 
-NSString * const POScriptManagerErrorDomain;
-POScriptManager *scriptManager;
+#define pyROIVolume_CheckExact(op) (Py_TYPE(op) == &pyROIVolumeType)
 
-@interface POScriptManager : NSObject
+@class ROIVolume;
+
+typedef struct
 {
-    BOOL managerReady;
-    NSArray *scriptHeaders;
-}
+    PyObject_HEAD
+    ROIVolume *obj;
+}pyROIVolumeObject;
 
-@property (readonly) BOOL managerReady;
-@property (readonly) NSArray *scriptHeaders;
-
-+ (NSString *) pluginDirectory;
-+ (NSString *)pathForScriptNamed: (NSString *)name;
-+ (NSURL *)urlForScriptNamed: (NSString *)name;
-+ (NSArray *)allowedTypes;
-+ (BOOL)typeAllowed:(NSString *)type;
-+ (NSString *)stringTemplateForType:(NSString *)type;
-
-- (BOOL) checkHeader:(NSString *)script headerInfo:(NSDictionary **)dict error:(NSError **)error;
-- (BOOL) installScriptFromURL:(NSURL *)url withError:(NSError **)error;
-- (BOOL) installScriptFromString:(NSString *)str withError:(NSError **)error;
-- (void) removeScriptsWithNames:(NSArray *)names;
-- (BOOL) removeScriptWithName:(NSString *)name;
-
-- (NSDictionary *) readHeaderInfoForScriptName:(NSString *)name;
-- (NSDictionary *) readHeaderInfoForScriptFile:(NSString *)file;
-- (NSDictionary *) readHeaderInfoForScriptURL:(NSURL *)url;
-
-- (BOOL)scriptPresentWithName:(NSString *)name;
-- (BOOL)scriptPresentWithName:(NSString *)name :(NSDictionary **)header;
-- (NSArray *) scriptNamesForType:(NSString *)type;
-- (NSString *)getScriptWithName:(NSString *)name;
-
-
-
+@interface pyROIVolume : NSObject <pyOsiriXType>
 
 @end

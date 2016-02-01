@@ -37,6 +37,33 @@
 
 @implementation POErrorAlertLog
 
++ (NSInteger)alertWithMessageText:(NSString *)message :(NSString *)firstButton :(NSString *)secondButton :(NSString *)thirdButton :(NSString *)informativeTextWithFormat, ...
+{
+	NSAlert *alert = [[NSAlert alloc] init];
+	if (message)
+		[alert setMessageText:message];
+	if (firstButton)
+		[alert addButtonWithTitle:firstButton];
+	if (secondButton)
+		[alert addButtonWithTitle:secondButton];
+	if (thirdButton)
+		[alert addButtonWithTitle:thirdButton];
+	if (informativeTextWithFormat)
+	{
+		va_list args;
+		va_start(args, informativeTextWithFormat);
+		NSString *infText = [[NSString alloc] initWithFormat:informativeTextWithFormat arguments:args];
+		[alert setInformativeText:infText];
+		[infText release];
+		va_end(args);
+	}
+	[alert setAlertStyle:NSWarningAlertStyle];
+	
+	NSInteger response = (NSInteger)[alert runModal];
+	[alert release];
+	return response;
+}
+
 + (PyObject *) newErrorAlertLog
 {
     POErrorAlertLog *new = [[POErrorAlertLog alloc] init];
@@ -47,7 +74,7 @@
 
 - (void) alertError
 {
-    NSRunAlertPanel(@"Python Error", stringBin, @"OK", nil, nil);
+	[POErrorAlertLog alertWithMessageText:@"Python Error" :@"OK" :nil :nil :stringBin];
     [stringBin release];
     stringBin = nil;
 }

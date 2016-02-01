@@ -44,7 +44,7 @@
 #ifndef __vtkUnicodeString_h
 #define __vtkUnicodeString_h
 
-#include <vtkSystemIncludes.h>
+#include "vtkSystemIncludes.h"
 #include <string>
 #include <vector>
 

@@ -42,10 +42,36 @@ NSString * const POScriptManagerErrorDomain = @"com.InstituteOfCancerResearch.py
 
 @implementation POScriptManager
 
-@synthesize managerReady;
-@synthesize scriptHeaders;
+@synthesize managerReady, scriptHeaders;
 
 #pragma mark Invisible utilities
+
++ (NSInteger)alertWithMessageText:(NSString *)message :(NSString *)firstButton :(NSString *)secondButton :(NSString *)thirdButton :(NSString *)informativeTextWithFormat, ...
+{
+	NSAlert *alert = [[NSAlert alloc] init];
+	if (message)
+		[alert setMessageText:message];
+	if (firstButton)
+		[alert addButtonWithTitle:firstButton];
+	if (secondButton)
+		[alert addButtonWithTitle:secondButton];
+	if (thirdButton)
+		[alert addButtonWithTitle:thirdButton];
+	if (informativeTextWithFormat)
+	{
+		va_list args;
+		va_start(args, informativeTextWithFormat);
+		NSString *infText = [[NSString alloc] initWithFormat:informativeTextWithFormat arguments:args];
+		[alert setInformativeText:infText];
+		[infText release];
+		va_end(args);
+	}
+	[alert setAlertStyle:NSWarningAlertStyle];
+	
+	NSInteger response = (NSInteger)[alert runModal];
+	[alert release];
+	return response;
+}
 
 + (NSString *) pluginDirectory
 {
@@ -95,6 +121,9 @@ NSString * const POScriptManagerErrorDomain = @"com.InstituteOfCancerResearch.py
 
 - (void)loadCurrentScriptHeaders
 {
+	if (scriptHeaders != nil) {
+		[scriptHeaders release];
+	}
     NSString *pluginDir = [POScriptManager pluginDirectory];
     NSFileManager *fm = [NSFileManager defaultManager];
     NSError *error;
@@ -127,10 +156,11 @@ NSString * const POScriptManagerErrorDomain = @"com.InstituteOfCancerResearch.py
 - (id)init
 {
     self = [super init];
-    if (!self) {
+	if (!self) {
         return  nil;
     }
     [self ensureDirectory];
+    scriptHeaders = nil;
     [self loadCurrentScriptHeaders];
     return self;
 }
@@ -142,7 +172,13 @@ NSString * const POScriptManagerErrorDomain = @"com.InstituteOfCancerResearch.py
     [super dealloc];
 }
 
+#pragma mark -
 #pragma mark Tools to get access to installed scripts
+
+- (NSArray *)scriptHeaders
+{
+	return [NSArray arrayWithArray:scriptHeaders];
+}
 
 - (BOOL)scriptPresentWithName:(NSString *)name
 {
@@ -189,12 +225,12 @@ NSString * const POScriptManagerErrorDomain = @"com.InstituteOfCancerResearch.py
     NSError *error;
     NSString *script = [NSString stringWithContentsOfURL:url encoding:NSUTF8StringEncoding error:&error];
     if (!script) {
-        NSLog(@"Could not load script.  Error:%@", error);
         return nil;
     }
     return script;
 }
 
+#pragma mark -
 #pragma mark Tools to read script headers
 
 //These need to be fast, therefore read byte streams
@@ -372,6 +408,7 @@ NSString * const POScriptManagerErrorDomain = @"com.InstituteOfCancerResearch.py
     return headerInfo;
 }
 
+#pragma mark -
 #pragma mark Access to allowed script types
 
 + (NSArray *)allowedTypes //TODO - Should this be set up as an enumerated list?
@@ -422,6 +459,7 @@ NSString * const POScriptManagerErrorDomain = @"com.InstituteOfCancerResearch.py
     return template;
 }
 
+#pragma mark -
 #pragma mark Tools to install python scripts
 
 - (BOOL) checkHeader:(NSString *)script headerInfo:(NSDictionary **)dict error:(NSError **)error
@@ -517,6 +555,41 @@ NSString * const POScriptManagerErrorDomain = @"com.InstituteOfCancerResearch.py
     return YES;
 }
 
+- (BOOL) removeScriptWithName:(NSString *)name
+{
+	NSString *path = [POScriptManager pathForScriptNamed:name];
+	NSFileManager *fm = [NSFileManager defaultManager];
+    if ([fm fileExistsAtPath:path]) {
+		NSError *err;
+		if (![fm removeItemAtPath:path error:&err]) {
+			NSLog(@"POScriptManager: Could not remove script at path: %@\nError given:%@", path, err);
+			return NO;
+		}
+		[self loadCurrentScriptHeaders];
+		return YES;
+	}
+	return NO;
+}
+
+- (void) removeScriptsWithNames:(NSArray *)names
+{
+	BOOL successfullyRemoved = NO;
+	for (NSString *name in names) {
+		NSString *path = [POScriptManager pathForScriptNamed:name];
+		NSFileManager *fm = [NSFileManager defaultManager];
+		if ([fm fileExistsAtPath:path]) {
+			NSError *err;
+			if (![fm removeItemAtPath:path error:&err]) {
+				NSLog(@"POScriptManager: Could not remove script at path: %@\nError given:%@", path, err);
+			}
+			else
+				successfullyRemoved = YES;
+		}
+	}
+	if (successfullyRemoved)
+		[self loadCurrentScriptHeaders];
+}
+
 - (BOOL) installScriptFromURL:(NSURL *)url withError:(NSError **)error
 {
     NSString *script = [NSString stringWithContentsOfURL:url encoding:NSUTF8StringEncoding error:error];
@@ -538,7 +611,9 @@ NSString * const POScriptManagerErrorDomain = @"com.InstituteOfCancerResearch.py
     NSDictionary *headerInfo;
     BOOL OK = [self checkHeader:script headerInfo:&headerInfo error:error];
     if (!OK)
-        return NO;
+	{
+		return NO;
+	}
     
     NSString *scriptName = [headerInfo valueForKey:@"name"];
     NSString *scriptFile = [NSString stringWithFormat:@"%@/%@.py", pluginDir, scriptName];
@@ -547,16 +622,21 @@ NSString * const POScriptManagerErrorDomain = @"com.InstituteOfCancerResearch.py
     if ([fm fileExistsAtPath:scriptFile]) {
         NSDictionary *prevHeaderInfo = [self readHeaderInfoForScriptFile:scriptFile];
         if (prevHeaderInfo) {
-            int overwrite = NSRunAlertPanel(pluginName, @"Do you wish to replace\r%@ v. %@\rwith\r%@ v. %@?", @"OK", @"Cancel", nil, [prevHeaderInfo objectForKey:@"name"], [prevHeaderInfo objectForKey:@"version"], [headerInfo objectForKey:@"name"], [headerInfo objectForKey:@"version"]);
-            if (overwrite == NSCancelButton)
-                return YES; //No error here.
+			NSInteger response = [POScriptManager alertWithMessageText:pluginName :@"OK" :@"Cancel" :nil :@"Do you wish to replace\r%@ v. %@\rwith\r%@ v. %@?",  [prevHeaderInfo objectForKey:@"name"], [prevHeaderInfo objectForKey:@"version"], [headerInfo objectForKey:@"name"], [headerInfo objectForKey:@"version"]];
+			if (response == NSAlertSecondButtonReturn) {
+				return YES;
+			}
         }
     }
     
     OK = [script writeToFile:scriptFile atomically:YES encoding:NSUTF8StringEncoding error:error];
     if (!OK)
+	{
         return NO;
+	}
     
+	[self loadCurrentScriptHeaders];
+	
     return YES;
 }
 

@@ -38,11 +38,42 @@
 #import "pyDicomSeries.h"
 #import "pyDicomStudy.h"
 
+# pragma mark -
+# pragma mark pyBrowserControllerObject initialization/deallocation
+
 static void pyBrowserController_dealloc(pyBrowserControllerObject *self)
 {
     [self->obj release];
     self->ob_type->tp_free(self);
 }
+
+# pragma mark -
+# pragma mark pyBrowserControllerObject str/repr
+
+static PyObject *pyBrowserController_str(pyBrowserControllerObject *self)
+{
+	NSString *str = [NSString stringWithFormat:@"BrowserController object.  The main database window of OsiriX."];
+	PyObject *ostr = PyString_FromString([str UTF8String]);
+	if (ostr == NULL) {
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+	return ostr;
+}
+
+# pragma mark -
+# pragma mark pyBrowserControllerObject methods
+
+PyDoc_STRVAR(BrowserControllerDatabaseSelection_doc,
+			 "\n"
+			 "Return current selection of DicomStudy and DiscomSeries instances currently selected in the database window.\n"
+			 "\n"
+			 "Args:\n"
+			 "    None\n"
+			 "\n"
+			 "Returns:\n"
+			 "    tuple: A tuple of all selected DicomStudy and DicomSeries instances.\n"
+			 );
 
 static PyObject *pyBrowserController_databaseSelection(pyBrowserControllerObject *self)
 {
@@ -81,6 +112,18 @@ static PyObject *pyBrowserController_databaseSelection(pyBrowserControllerObject
     }
     return tup;
 }
+
+PyDoc_STRVAR(BrowserControllerCopyFilesIntoDatabaseIfNeeded_doc,
+			 "\n"
+			 "Import a list of dicom files into the database.  If they are already present, this operation is a no-op.\n"
+			 "Note that this method will make a COPY of the files and store them in the currently active database.\n"
+			 "\n"
+			 "Args:\n"
+			 "    filenames (list): A list of absolute paths for the dicom files to be added.\n"
+			 "\n"
+			 "Returns:\n"
+			 "    None.\n"
+			 );
 
 static PyObject *pyBrowserController_copyFilesIntoDatabaseIfNeeded(pyBrowserControllerObject *self, PyObject *args)
 {
@@ -121,10 +164,26 @@ static PyObject *pyBrowserController_copyFilesIntoDatabaseIfNeeded(pyBrowserCont
 
 static PyMethodDef pyBrowserControllerMethods[] =
 {
-    {"databaseSelection", (PyCFunction)pyBrowserController_databaseSelection, METH_NOARGS, "Get the current user database selection"},
-	{"copyFilesIntoDatabaseIfNeeded", (PyCFunction)pyBrowserController_copyFilesIntoDatabaseIfNeeded, METH_VARARGS, "Import the list of dicom files into the OsiriX database.  This function will COPY the files!"},
+    {"databaseSelection", (PyCFunction)pyBrowserController_databaseSelection, METH_NOARGS, BrowserControllerDatabaseSelection_doc},
+	{"copyFilesIntoDatabaseIfNeeded", (PyCFunction)pyBrowserController_copyFilesIntoDatabaseIfNeeded, METH_VARARGS, BrowserControllerCopyFilesIntoDatabaseIfNeeded_doc},
     {NULL}
 };
+
+# pragma mark -
+# pragma mark pyBrowserControllerType definition
+
+PyDoc_STRVAR(BrowserController_doc,
+			 "A python implementation of the OsiriX 'BrowserController' class.\n"
+			 "This class is used to obtain access to studies, series and images within the OsiriX database.\n"
+			 "Furthermore, this class provides a simple method to import dicom images into the OsiriX database"
+			 "Instances of this class may not be created.  Instead instances are accessed\n"
+			 "via functions defined in the osirix module\n"
+			 "\n"
+			 "Example Usage:\n"
+			 "    >>> import osirix\n"
+			 "    >>> bc = osirix.currentBrowser()\n"
+			 "    >>> print bc.databaseSelection\n"
+			 );
 
 PyTypeObject pyBrowserControllerType =
 {
@@ -144,12 +203,12 @@ PyTypeObject pyBrowserControllerType =
     0,
     0,
     0,
-    0,
+    (reprfunc)pyBrowserController_str,
     0,
     0,
     0,
     Py_TPFLAGS_DEFAULT,
-    "Browser Controller",
+    BrowserController_doc,
     0,
     0,
     0,
@@ -168,6 +227,9 @@ PyTypeObject pyBrowserControllerType =
     0,
     0,
 };
+
+# pragma mark -
+# pragma mark pyBrowserController implementation
 
 @implementation pyBrowserController
 

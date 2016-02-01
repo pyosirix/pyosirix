@@ -54,8 +54,6 @@ NSString * const pythonRuntimeErrorDomain = @"com.InstituteOfCancerResearch.pyOs
 
 PORuntime * pyRuntime = nil;
 
-BOOL runLoop;
-
 @implementation PORuntime
 
 @synthesize pythonInitialized, runtimeActive;
@@ -80,9 +78,8 @@ BOOL runLoop;
 {
     //Performing these intial imports on load can speed things up later.
     PyRun_SimpleString("import osirix, dicom, numpy, matplotlib");
-    PyRun_SimpleString("import matplotlib.pyplot");
+    PyRun_SimpleString("import matplotlib.pyplot as pl");
     PyRun_SimpleString("import numpy as np");
-	PyRun_SimpleString("print \"Here I am\"");
 }
 
 - (NSString *)getSysPath
@@ -129,11 +126,13 @@ BOOL runLoop;
 		
         //Register the osirix module
         [pyOsiriX initModule];
+		
+		//Import these on application launch.  Will appear seamless later on.
+		[self importExternalModules];
         
         pythonInitialized = YES;
         
         [self updateSysPath];
-        [self importExternalModules];
     }
     @catch (NSException *exception) {
         //If something goes wrong allow OsiriX to continue!
@@ -197,6 +196,7 @@ BOOL runLoop;
     else
         PySys_SetObject("stderr", default_log);
     
+	[self importExternalModules];
     runtimeActive = YES;
     return YES;
 }

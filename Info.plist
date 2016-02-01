@@ -15,14 +15,17 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>0.0.1a</string>
+	<string>1.0.1b</string>
 	<key>NSPrincipalClass</key>
 	<string>pyOsiriXFilter</string>
 	<key>MenuTitles</key>
 	<array>
-		<string>pyOsiriX</string>
+		<string>Start Terminal</string>
+		<string>Package Manager</string>
+		<string>Script Manager</string>
+		<string>Clean Python Environment</string>
 	</array>
 	<key>pluginType</key>
-	<string>imageFilter</string>
+	<string>Database</string>
 </dict>
 </plist>

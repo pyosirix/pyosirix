@@ -51,5 +51,6 @@ typedef struct
 @interface pyROI : NSObject <pyOsiriXType>
 
 + (NSDictionary *)toolsDictionary;
++ (NSString *)toolTypeDescriptionForNumber:(NSNumber *)num;
 
 @end

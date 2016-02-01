@@ -158,7 +158,7 @@
 	}
 	else {
 		NSFont *font = [[NSFont fontWithName:@"Menlo-Regular" size:12.0] retain];
-		NSColor *color = [[NSColor colorWithCalibratedRed:0.55 green:0.6 blue:1.0 alpha:1.0] retain];
+		NSColor *color = [[NSColor colorWithCalibratedRed:0.55 green:0.6 blue:0.0 alpha:1.0] retain];
 		numericAttributes = [[NSDictionary dictionaryWithObjectsAndKeys:font, POPSM_FONT_KEY, color, POPSM_COLOR_KEY, nil] retain];
 		[defs setObject:[self defaultsDictionaryFromAttibute:numericAttributes] forKey:POPSM_NUMBERS];
 	}
@@ -204,12 +204,12 @@
 		return keywordAttributes;
 	if ([[keywordDefinitions objectForKey:@"functions"] containsObject:word])
 		return functionAttributes;
-	if ([[keywordDefinitions objectForKey:@"osirix"] containsObject:word])
-		return osirixAttributes;
 	if ([[keywordDefinitions objectForKey:@"exceptions"] containsObject:word])
 		return exceptionAttributes;
 	if ([[keywordDefinitions objectForKey:@"constants"] containsObject:word])
 		return constantAttributes;
+	if ([[keywordDefinitions objectForKey:@"osirix"] containsObject:word])
+		return textAttributes; //For now do not color these words...
 	return textAttributes;
 }
 

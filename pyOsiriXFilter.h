@@ -43,6 +43,7 @@
 #import "POScriptEditorController.h"
 #import "POScriptManager.h"
 #import "POPackageWindowController.h"
+#import "POScriptWindowController.h"
 #import "POErrorAlertLog.h"
 
 extern NSString* const pluginName;
@@ -50,8 +51,9 @@ extern NSString* const pluginName;
 @interface pyOsiriXFilter : PluginFilter {
     IBOutlet NSView *pythonButton;
     IBOutlet NSPopUpButton *popUp;
-    POScriptEditorController *scriptController;
+    POScriptEditorController *scriptEditorController;
     POPackageWindowController *packageController;
+	POScriptWindowController *scriptWindowController;
 }
 
 -(NSToolbarItem *)toolbarItemForItemIdentifier: (NSString *)itemIdent forViewer:(ViewerController *)vc;

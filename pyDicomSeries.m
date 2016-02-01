@@ -40,17 +40,45 @@
 #import <OsiriXAPI/DicomStudy.h>
 #include <Python/datetime.h>
 
+# pragma mark -
+# pragma mark pyDicomSeries initialization/deallocation
+
 static void pyDicomSeries_dealloc(pyDicomSeriesObject *self)
 {
     [self->obj release];
     self->ob_type->tp_free(self);
 }
 
+# pragma mark -
+# pragma mark pyDicomSeriesObject str/repr
+
+static PyObject *DicomSeries_str(pyDicomSeriesObject *self)
+{
+	NSString *str = [NSString stringWithFormat:@"DicomSeries object\nName: %@\nDate: %@\nModality:%@\nNumber of images:%@\n", [self->obj name], [self->obj date], [self->obj modality], [self->obj numberOfImages]];
+	PyObject *ostr = PyString_FromString([str UTF8String]);
+	if (ostr == NULL) {
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+	return ostr;
+}
+
+# pragma mark -
+# pragma mark pyDicomSeries getters/setters
+
+PyDoc_STRVAR(DicomSeriesStudyAttr_doc,
+			 "The DicomStudy associated with the DicomSeries. This property cannot be set.\n"
+			 );
+
 static PyObject *pyDicomSeries_getStudy(pyDicomSeriesObject *self, void *closure)
 {
     DicomStudy *study = [self->obj study];
     return [pyDicomStudy pythonObjectWithInstance:study];
 }
+
+PyDoc_STRVAR(DicomSeriesImagesAttr_doc,
+			 "A tuple of DicomImages associated with the DicomSeries. This property cannot be set.\n"
+			 );
 
 static PyObject *pyDicomSeries_getImages(pyDicomSeriesObject *self, void *closure)
 {
@@ -78,11 +106,19 @@ static PyObject *pyDicomSeries_getImages(pyDicomSeriesObject *self, void *closur
     return tup;
 }
 
+PyDoc_STRVAR(DicomSeriesNumberOfImages_doc,
+			 "The integer number of images in the DicomSeries. This property cannot be set.\n"
+			 );
+
 static PyObject *pyDicomSeries_getNumberOfImages(pyDicomSeriesObject *self, void *closure)
 {
     NSNumber *num = [self->obj numberOfImages];
     return PyInt_FromLong([num longValue]);
 }
+
+PyDoc_STRVAR(DicomSeriesInstanceUIDAttr_doc,
+			 "A string of the series UID for the DicomSeries. This property cannot be set.\n"
+			 );
 
 static PyObject *pyDicomSeries_getSeriesInstanceUID(pyDicomSeriesObject *self, void *closure)
 {
@@ -90,11 +126,19 @@ static PyObject *pyDicomSeries_getSeriesInstanceUID(pyDicomSeriesObject *self, v
     return PyString_FromString([uid UTF8String]);
 }
 
+PyDoc_STRVAR(DicomSeriesSOPClassUIDAttr_doc,
+			 "A string of the series SOP class UID for the DicomSeries. This property cannot be set.\n"
+			 );
+
 static PyObject *pyDicomSeries_getSeriesSOPClassUID(pyDicomSeriesObject *self, void *closure)
 {
     NSString *uid = [self->obj seriesSOPClassUID];
     return PyString_FromString([uid UTF8String]);
 }
+
+PyDoc_STRVAR(DicomSeriesDescriptionAttr_doc,
+			 "A string of the series UID for the DicomSeries. This property cannot be set.\n"
+			 );
 
 static PyObject *pyDicomSeries_getSeriesDescription(pyDicomSeriesObject *self, void *closure)
 {
@@ -102,17 +146,29 @@ static PyObject *pyDicomSeries_getSeriesDescription(pyDicomSeriesObject *self, v
     return PyString_FromString([desc UTF8String]);
 }
 
+PyDoc_STRVAR(DicomSeriesModalityAttr_doc,
+			 "A string of the DicomSeries modality. This property cannot be set.\n"
+			 );
+
 static PyObject *pyDicomSeries_getModality(pyDicomSeriesObject *self, void *closure)
 {
     NSString *mod = [self->obj modality];
     return PyString_FromString([mod UTF8String]);
 }
 
+PyDoc_STRVAR(DicomSeriesNameAttr_doc,
+			 "A string of the DicomSeries name. This property cannot be set.\n"
+			 );
+
 static PyObject *pyDicomSeries_getName(pyDicomSeriesObject *self, void *closure)
 {
     NSString *name = [self->obj name];
     return PyString_FromString([name UTF8String]);
 }
+
+PyDoc_STRVAR(DicomSeriesDateAttr_doc,
+			 "A date object for the DicomSeries. This property cannot be set.\n"
+			 );
 
 static PyObject *pyDicomSeries_getDate(pyDicomSeriesObject *self, void *closure)
 {
@@ -124,17 +180,32 @@ static PyObject *pyDicomSeries_getDate(pyDicomSeriesObject *self, void *closure)
 
 static PyGetSetDef pyDicomSeries_getsetters[] =
 {
-    {"study", (getter)pyDicomSeries_getStudy, NULL, "The DicomStudy to which the series belongs", NULL},
-    {"images", (getter)pyDicomSeries_getImages, NULL, "The DicomImages that are contained by the series", NULL},
-    {"numberOfImages", (getter)pyDicomSeries_getNumberOfImages, NULL, "The number of DicomImages that are contained by the series", NULL},
-    {"seriesInstanceUID", (getter)pyDicomSeries_getSeriesInstanceUID, NULL, "The series instance UID as a string value", NULL},
-    {"seriesSOPClassUID", (getter)pyDicomSeries_getSeriesSOPClassUID, NULL, "The series SOP class UID as a string value", NULL},
-    {"seriesDescription", (getter)pyDicomSeries_getSeriesDescription, NULL, "The series description", NULL},
-    {"modality", (getter)pyDicomSeries_getModality, NULL, "The series modality", NULL},
-    {"name", (getter)pyDicomSeries_getName, NULL, "The series name", NULL},
-    {"date", (getter)pyDicomSeries_getDate, NULL, "A datetime.datetime object referenceing the date and time of the DicomSeries", NULL},
+    {"study", (getter)pyDicomSeries_getStudy, NULL, DicomSeriesStudyAttr_doc, NULL},
+    {"images", (getter)pyDicomSeries_getImages, NULL, DicomSeriesImagesAttr_doc, NULL},
+    {"numberOfImages", (getter)pyDicomSeries_getNumberOfImages, NULL, DicomSeriesNumberOfImages_doc, NULL},
+    {"seriesInstanceUID", (getter)pyDicomSeries_getSeriesInstanceUID, NULL, DicomSeriesInstanceUIDAttr_doc, NULL},
+    {"seriesSOPClassUID", (getter)pyDicomSeries_getSeriesSOPClassUID, NULL, DicomSeriesSOPClassUIDAttr_doc, NULL},
+    {"seriesDescription", (getter)pyDicomSeries_getSeriesDescription, NULL, DicomSeriesDescriptionAttr_doc, NULL},
+    {"modality", (getter)pyDicomSeries_getModality, NULL, DicomSeriesModalityAttr_doc, NULL},
+    {"name", (getter)pyDicomSeries_getName, NULL, DicomSeriesNameAttr_doc, NULL},
+    {"date", (getter)pyDicomSeries_getDate, NULL, DicomSeriesDateAttr_doc, NULL},
     {NULL}
 };
+
+# pragma mark -
+# pragma mark pyDicomSeriesObject methods
+
+PyDoc_STRVAR(DicomSeriesPaths_doc,
+			 "\n"
+			 "Returns a tuple containing the paths of all associated dicom files for the series.\n"
+			 "\n"
+			 "Args:\n"
+			 "    None.\n"
+			 "\n"
+			 "Returns:\n"
+			 "    tuple: The filepaths to all associated dicom SOP instances.\n"
+			 "\n"
+			 );
 
 static PyObject *pyDicomSeries_paths(pyDicomSeriesObject *self)
 {
@@ -153,11 +224,35 @@ static PyObject *pyDicomSeries_paths(pyDicomSeriesObject *self)
     return tup;
 }
 
+PyDoc_STRVAR(DicomSeriesPreviousSeries_doc,
+			 "\n"
+			 "Returns a reference to the previous series in the OsiriX browser.\n"
+			 "\n"
+			 "Args:\n"
+			 "    None.\n"
+			 "\n"
+			 "Returns:\n"
+			 "    DicomSeries: See above.\n"
+			 "\n"
+			 );
+
 static PyObject *pyDicomSeries_previousSeries(pyDicomSeriesObject *self)
 {
     DicomSeries *series = [self->obj previousSeries];
     return [pyDicomSeries pythonObjectWithInstance:series];
 }
+
+PyDoc_STRVAR(DicomSeriesNextSeries_doc,
+			 "\n"
+			 "Returns a reference to the next series in the OsiriX browser.\n"
+			 "\n"
+			 "Args:\n"
+			 "    None.\n"
+			 "\n"
+			 "Returns:\n"
+			 "    DicomSeries: See above.\n"
+			 "\n"
+			 );
 
 static PyObject *pyDicomSeries_nextSeries(pyDicomSeriesObject *self)
 {
@@ -165,11 +260,25 @@ static PyObject *pyDicomSeries_nextSeries(pyDicomSeriesObject *self)
     return [pyDicomSeries pythonObjectWithInstance:series];
 }
 
-static PyObject *pyDicomSeries_uniqueFilename(pyDicomSeriesObject *self)
-{
-    NSString *uniq = [self->obj uniqueFilename];
-    return PyString_FromString([uniq UTF8String]);
-}
+// TODO - What does this do?
+//static PyObject *pyDicomSeries_uniqueFilename(pyDicomSeriesObject *self)
+//{
+//    NSString *uniq = [self->obj uniqueFilename];
+//    return PyString_FromString([uniq UTF8String]);
+//}
+
+PyDoc_STRVAR(DicomSeriesSortedImages_doc,
+			 "\n"
+			 "Returns a tuple of DicomImage instances sorted accorrding to the cirteria \n"
+			 "currently set by the OsiriX browser.\n"
+			 "\n"
+			 "Args:\n"
+			 "    None.\n"
+			 "\n"
+			 "Returns:\n"
+			 "    tuple: A tuple of DicomImage instances.\n"
+			 "\n"
+			 );
 
 static PyObject *pyDicomSeries_sortedImages(pyDicomSeriesObject *self)
 {
@@ -190,13 +299,23 @@ static PyObject *pyDicomSeries_sortedImages(pyDicomSeriesObject *self)
 
 static PyMethodDef pyDicomSeriesMethods[] =
 {
-    {"paths", (PyCFunction)pyDicomSeries_paths, METH_NOARGS, "Get a tuple of complete paths for the  contained DicomImages"},
-    {"previousSeries", (PyCFunction)pyDicomSeries_previousSeries, METH_NOARGS, "Get the previous DicomSeries instance in the browser"},
-    {"nextSeries", (PyCFunction)pyDicomSeries_nextSeries, METH_NOARGS, "Get the next DicomSeries instance in the browser"},
-    {"uniqueFilename", (PyCFunction)pyDicomSeries_uniqueFilename, METH_NOARGS, "Get a string representing a unique filename for the series"},
-    {"sortedImages", (PyCFunction)pyDicomSeries_sortedImages, METH_NOARGS, "Return a tuple of DicomImages sorted by slice location"},
+    {"paths", (PyCFunction)pyDicomSeries_paths, METH_NOARGS, DicomSeriesPaths_doc},
+    {"previousSeries", (PyCFunction)pyDicomSeries_previousSeries, METH_NOARGS, DicomSeriesPreviousSeries_doc},
+    {"nextSeries", (PyCFunction)pyDicomSeries_nextSeries, METH_NOARGS, DicomSeriesNextSeries_doc},
+    //{"uniqueFilename", (PyCFunction)pyDicomSeries_uniqueFilename, METH_NOARGS, "Get a string representing a unique filename for the series"},
+    {"sortedImages", (PyCFunction)pyDicomSeries_sortedImages, METH_NOARGS, DicomSeriesSortedImages_doc},
     {NULL}
 };
+
+# pragma mark -
+# pragma mark pyDicomSeriesType definition
+
+PyDoc_STRVAR(DicomSeries_doc,
+			 "A python implementation of the OsiriX 'DicomSeries' class.\n"
+			 "DicomSeries is a convienience class used by the main browser within OsiriX to organise and group dicom instances within the same series.\n"
+			 "Instances of this class may not be created.  Instead instances are accessed\n"
+			 "via functions defined in the BrowserController class\n"
+			 );
 
 PyTypeObject pyDicomSeriesType =
 {
@@ -216,12 +335,12 @@ PyTypeObject pyDicomSeriesType =
     0,
     0,
     0,
-    0,
+    (reprfunc)DicomSeries_str,
     0,
     0,
     0,
     Py_TPFLAGS_DEFAULT,
-    "DicomSeries objects",
+    DicomSeries_doc,
     0,
     0,
     0,
@@ -240,6 +359,9 @@ PyTypeObject pyDicomSeriesType =
     0,
     0,
 };
+
+# pragma mark -
+# pragma mark pyDicomSeries implementation
 
 @implementation pyDicomSeries
 

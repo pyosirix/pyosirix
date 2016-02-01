@@ -41,17 +41,45 @@
 #import <OsiriXAPI/DicomStudy.h>
 #include <Python/datetime.h>
 
+# pragma mark -
+# pragma mark pyDicomStudy initialization/deallocation
+
 static void pyDicomStudy_dealloc(pyDicomStudyObject *self)
 {
     [self->obj release];
     self->ob_type->tp_free(self);
 }
 
+# pragma mark -
+# pragma mark pyDicomStudyObject str/repr
+
+static PyObject *DicomStudy_str(pyDicomStudyObject *self)
+{
+	NSString *str = [NSString stringWithFormat:@"DicomStudy object\nName: %@\nDate: %@\nModality:%@\nNumber of images:%@\n", [self->obj name], [self->obj date], [self->obj modality], [self->obj numberOfImages]];
+	PyObject *ostr = PyString_FromString([str UTF8String]);
+	if (ostr == NULL) {
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+	return ostr;
+}
+
+# pragma mark -
+# pragma mark pyDicomStudyObject getters/setters
+
+PyDoc_STRVAR(DicomStudyNumberOfImagesAttr_doc,
+			 "The integer number of images contained by the DicomStudy. This property cannot be set.\n"
+			 );
+
 static PyObject *pyDicomStudy_getNumberOfImages(pyDicomStudyObject *self, void *closure)
 {
     NSNumber *num = [self->obj numberOfImages];
     return PyInt_FromLong([num longValue]);
 }
+
+PyDoc_STRVAR(DicomStudySeriesAttr_doc,
+			 "A tuple containing all DicomSeries within the DicomStudy. This property cannot be set.\n"
+			 );
 
 static PyObject *pyDicomStudy_getSeries(pyDicomStudyObject *self, void *closure)
 {
@@ -71,6 +99,10 @@ static PyObject *pyDicomStudy_getSeries(pyDicomStudyObject *self, void *closure)
     return oArr;
 }
 
+PyDoc_STRVAR(DicomStudyNameAttr_doc,
+			 "The patient name for DicomStudy as a string. This property cannot be set.\n"
+			 );
+
 static PyObject *pyDicomStudy_getName(pyDicomStudyObject *self, void *closure)
 {
     NSString *name = [self->obj name];
@@ -80,6 +112,10 @@ static PyObject *pyDicomStudy_getName(pyDicomStudyObject *self, void *closure)
     }
     return PyString_FromString([name UTF8String]);
 }
+
+PyDoc_STRVAR(DicomStudyDateAttr_doc,
+			 "The date of the DicomStudy as a datetime object. This property cannot be set.\n"
+			 );
 
 static PyObject *pyDicomStudy_getDate(pyDicomStudyObject *self, void *closure)
 {
@@ -93,6 +129,10 @@ static PyObject *pyDicomStudy_getDate(pyDicomStudyObject *self, void *closure)
     return oDate;
 }
 
+PyDoc_STRVAR(DicomStudyDateAddedAttr_doc,
+			 "The date the DicomStudy was added to OsiriX as a datetime object. This property cannot be set.\n"
+			 );
+
 static PyObject *pyDicomStudy_getDateAdded(pyDicomStudyObject *self, void *closure)
 {
     NSDate *date = [self->obj dateAdded];
@@ -104,6 +144,10 @@ static PyObject *pyDicomStudy_getDateAdded(pyDicomStudyObject *self, void *closu
     PyObject * oDate = PyDateTime_FromDateAndTime((int)[comps year], (int)[comps month], (int)[comps day], (int)[comps hour], (int)[comps minute], (int)[comps second], (int)([comps nanosecond]*1000));
     return oDate;
 }
+
+PyDoc_STRVAR(DicomStudyDateOfBirthAttr_doc,
+			 "The patient DOB for the DicomStudy as a datetime object. This property cannot be set.\n"
+			 );
 
 static PyObject *pyDicomStudy_getDateOfBirth(pyDicomStudyObject *self, void *closure)
 {
@@ -117,6 +161,10 @@ static PyObject *pyDicomStudy_getDateOfBirth(pyDicomStudyObject *self, void *clo
     return oDate;
 }
 
+PyDoc_STRVAR(DicomStudyInstitutionNameAttr_doc,
+			 "The institution name of the DicomStudy as a string. This property cannot be set.\n"
+			 );
+
 static PyObject *pyDicomStudy_getInstitutionName(pyDicomStudyObject *self, void *closure)
 {
     NSString *inst = [self->obj institutionName];
@@ -126,6 +174,10 @@ static PyObject *pyDicomStudy_getInstitutionName(pyDicomStudyObject *self, void 
     }
     return PyString_FromString([inst UTF8String]);
 }
+
+PyDoc_STRVAR(DicomStudyModalityAttr_doc,
+			 "The modality of the DicomStudy as a string. This property cannot be set.\n"
+			 );
 
 static PyObject *pyDicomStudy_getModality(pyDicomStudyObject *self, void *closure)
 {
@@ -137,6 +189,10 @@ static PyObject *pyDicomStudy_getModality(pyDicomStudyObject *self, void *closur
     return PyString_FromString([mod UTF8String]);
 }
 
+PyDoc_STRVAR(DicomStudyPatientIDAttr_doc,
+			 "The patient ID of the DicomStudy as a string. This property cannot be set.\n"
+			 );
+
 static PyObject *pyDicomStudy_getPatientID(pyDicomStudyObject *self, void *closure)
 {
     NSString *ID = [self->obj patientID];
@@ -146,6 +202,10 @@ static PyObject *pyDicomStudy_getPatientID(pyDicomStudyObject *self, void *closu
     }
     return PyString_FromString([ID UTF8String]);
 }
+
+PyDoc_STRVAR(DicomStudyPatientUIDAttr_doc,
+			 "The patient UID of the DicomStudy as a string. This property cannot be set.\n"
+			 );
 
 static PyObject *pyDicomStudy_getPatientUID(pyDicomStudyObject *self, void *closure)
 {
@@ -157,6 +217,10 @@ static PyObject *pyDicomStudy_getPatientUID(pyDicomStudyObject *self, void *clos
     return PyString_FromString([UID UTF8String]);
 }
 
+PyDoc_STRVAR(DicomStudyPatientSexAttr_doc,
+			 "The patient sex of the DicomStudy as a string. This property cannot be set.\n"
+			 );
+
 static PyObject *pyDicomStudy_getPatientSex(pyDicomStudyObject *self, void *closure)
 {
     NSString *sex = [self->obj patientSex];
@@ -166,6 +230,10 @@ static PyObject *pyDicomStudy_getPatientSex(pyDicomStudyObject *self, void *clos
     }
     return PyString_FromString([sex UTF8String]);
 }
+
+PyDoc_STRVAR(DicomStudyPerformingPhysicianAttr_doc,
+			 "The name of the performing physician for the DicomStudy as a string. This property cannot be set.\n"
+			 );
 
 static PyObject *pyDicomStudy_getPerformingPhysician(pyDicomStudyObject *self, void *closure)
 {
@@ -177,6 +245,10 @@ static PyObject *pyDicomStudy_getPerformingPhysician(pyDicomStudyObject *self, v
     return PyString_FromString([pp UTF8String]);
 }
 
+PyDoc_STRVAR(DicomStudyReferringPhysicianAttr_doc,
+			 "The name of the referring physician for the DicomStudy as a string. This property cannot be set.\n"
+			 );
+
 static PyObject *pyDicomStudy_getReferringPhysician(pyDicomStudyObject *self, void *closure)
 {
     NSString *rp = [self->obj referringPhysician];
@@ -187,6 +259,10 @@ static PyObject *pyDicomStudy_getReferringPhysician(pyDicomStudyObject *self, vo
     return PyString_FromString([rp UTF8String]);
 }
 
+PyDoc_STRVAR(DicomStudyUIDAttr_doc,
+			 "The DicomStudy UID as a string. This property cannot be set.\n"
+			 );
+
 static PyObject *pyDicomStudy_getStudyInstanceUID(pyDicomStudyObject *self, void *closure)
 {
     NSString *UID = [self->obj studyInstanceUID];
@@ -196,6 +272,10 @@ static PyObject *pyDicomStudy_getStudyInstanceUID(pyDicomStudyObject *self, void
     }
     return PyString_FromString([UID UTF8String]);
 }
+
+PyDoc_STRVAR(DicomStudyStudyNameAttr_doc,
+			 "The DicomStudy name as a string. This property cannot be set.\n"
+			 );
 
 static PyObject *pyDicomStudy_getStudyName(pyDicomStudyObject *self, void *closure)
 {
@@ -209,23 +289,38 @@ static PyObject *pyDicomStudy_getStudyName(pyDicomStudyObject *self, void *closu
 
 static PyGetSetDef pyDicomStudy_getsetters[] =
 {
-    {"numberOfImages", (getter)pyDicomStudy_getNumberOfImages, NULL, "The number of DicomImages that are contained by the study", NULL},
-    {"series", (getter)pyDicomStudy_getSeries, NULL, "The contained DicomSeries instances as a tuple", NULL},
-    {"name", (getter)pyDicomStudy_getName, NULL, "The patient name of the DicomStudy", NULL},
-    {"date", (getter)pyDicomStudy_getDate, NULL, "A datetime.datetime object referenceing the date and time of the DicomStudy", NULL},
-    {"dateAdded", (getter)pyDicomStudy_getDateAdded, NULL, "A datetime.datetime object referenceing the date and time of when the DicomStudy was added", NULL},
-    {"dateOfBirth", (getter)pyDicomStudy_getDateOfBirth, NULL, "A datetime.datetime object referenceing the date and time of the patients date of birth", NULL},
-    {"institutionName", (getter)pyDicomStudy_getInstitutionName, NULL, "The institution name of the DicomStudy", NULL},
-    {"modality", (getter)pyDicomStudy_getModality, NULL, "The modality of the DicomStudy", NULL},
-    {"patientID", (getter)pyDicomStudy_getPatientID, NULL, "The Patient ID of the DicomStudy", NULL},
-    {"patientUID", (getter)pyDicomStudy_getPatientUID, NULL, "The Patient UID of the DicomStudy", NULL},
-    {"patientSex", (getter)pyDicomStudy_getPatientSex, NULL, "The Patient Sex of the DicomStudy", NULL},
-    {"performingPhysician", (getter)pyDicomStudy_getPerformingPhysician, NULL, "The performing physician of the DicomStudy", NULL},
-    {"referringPhysician", (getter)pyDicomStudy_getReferringPhysician, NULL, "The referring physician of the DicomStudy", NULL},
-    {"studyInstanceUID", (getter)pyDicomStudy_getStudyInstanceUID, NULL, "The instance UID of the DicomStudy", NULL},
-    {"studyName", (getter)pyDicomStudy_getStudyName, NULL, "The study name of the DicomStudy", NULL},
+    {"numberOfImages", (getter)pyDicomStudy_getNumberOfImages, NULL, DicomStudyNumberOfImagesAttr_doc, NULL},
+    {"series", (getter)pyDicomStudy_getSeries, NULL, DicomStudySeriesAttr_doc, NULL},
+    {"name", (getter)pyDicomStudy_getName, NULL, DicomStudyNameAttr_doc, NULL},
+    {"date", (getter)pyDicomStudy_getDate, NULL, DicomStudyDateAttr_doc, NULL},
+    {"dateAdded", (getter)pyDicomStudy_getDateAdded, NULL, DicomStudyDateAddedAttr_doc, NULL},
+    {"dateOfBirth", (getter)pyDicomStudy_getDateOfBirth, NULL, DicomStudyDateOfBirthAttr_doc, NULL},
+    {"institutionName", (getter)pyDicomStudy_getInstitutionName, NULL, DicomStudyInstitutionNameAttr_doc, NULL},
+    {"modality", (getter)pyDicomStudy_getModality, NULL, DicomStudyModalityAttr_doc, NULL},
+    {"patientID", (getter)pyDicomStudy_getPatientID, NULL, DicomStudyPatientIDAttr_doc, NULL},
+    {"patientUID", (getter)pyDicomStudy_getPatientUID, NULL, DicomStudyPatientUIDAttr_doc, NULL},
+    {"patientSex", (getter)pyDicomStudy_getPatientSex, NULL, DicomStudyPatientSexAttr_doc, NULL},
+    {"performingPhysician", (getter)pyDicomStudy_getPerformingPhysician, NULL, DicomStudyPerformingPhysicianAttr_doc, NULL},
+    {"referringPhysician", (getter)pyDicomStudy_getReferringPhysician, NULL, DicomStudyReferringPhysicianAttr_doc, NULL},
+    {"studyInstanceUID", (getter)pyDicomStudy_getStudyInstanceUID, NULL, DicomStudyUIDAttr_doc, NULL},
+    {"studyName", (getter)pyDicomStudy_getStudyName, NULL, DicomStudyStudyNameAttr_doc, NULL},
     {NULL}
 };
+
+# pragma mark -
+# pragma mark pyDicomStudyObject methods
+
+PyDoc_STRVAR(DicomStudyPaths_doc,
+			 "\n"
+			 "Returns a tuple containing the paths of all associated dicom files for the study.\n"
+			 "\n"
+			 "Args:\n"
+			 "    None.\n"
+			 "\n"
+			 "Returns:\n"
+			 "    tuple: The filepaths to all associated dicom SOP instances.\n"
+			 "\n"
+			 );
 
 static PyObject *pyDicomStudy_paths(pyDicomStudyObject *self)
 {
@@ -243,6 +338,18 @@ static PyObject *pyDicomStudy_paths(pyDicomStudyObject *self)
     }
     return tup;
 }
+
+PyDoc_STRVAR(DicomStudyImages_doc,
+			 "\n"
+			 "Returns a tuple containing the DicomImages contained within the study.\n"
+			 "\n"
+			 "Args:\n"
+			 "    None.\n"
+			 "\n"
+			 "Returns:\n"
+			 "    tuple: The DicomImage instances contained within the study.\n"
+			 "\n"
+			 );
 
 static PyObject *pyDicomStudy_images(pyDicomStudyObject *self)
 {
@@ -270,6 +377,18 @@ static PyObject *pyDicomStudy_images(pyDicomStudyObject *self)
     return tup;
 }
 
+PyDoc_STRVAR(DicomStudyModalities_doc,
+			 "\n"
+			 "Returns a string with all modelities in the study.\n"
+			 "\n"
+			 "Args:\n"
+			 "    None.\n"
+			 "\n"
+			 "Returns:\n"
+			 "    str: See above.\n"
+			 "\n"
+			 );
+
 static PyObject *pyDicomStudy_modalities(pyDicomStudyObject *self)
 {
     NSString *str = [self->obj modalities];
@@ -279,6 +398,18 @@ static PyObject *pyDicomStudy_modalities(pyDicomStudyObject *self)
     }
     return PyString_FromString([str UTF8String]);
 }
+
+PyDoc_STRVAR(DicomStudyImageSeries_doc,
+			 "\n"
+			 "Returns a tuple containing the DicomSeries contained within the study.\n"
+			 "\n"
+			 "Args:\n"
+			 "    None.\n"
+			 "\n"
+			 "Returns:\n"
+			 "    tuple: The DicomSeries instances contained within the study.\n"
+			 "\n"
+			 );
 
 static PyObject *pyDicomStudy_imageSeries(pyDicomStudyObject *self)
 {
@@ -298,6 +429,18 @@ static PyObject *pyDicomStudy_imageSeries(pyDicomStudyObject *self)
     return oArr;
 }
 
+PyDoc_STRVAR(DicomStudyNoFiles_doc,
+			 "\n"
+			 "Returns the number of dicom files associated with the study.\n"
+			 "\n"
+			 "Args:\n"
+			 "    None.\n"
+			 "\n"
+			 "Returns:\n"
+			 "    int: See above.\n"
+			 "\n"
+			 );
+
 static PyObject *pyDicomStudy_noFiles(pyDicomStudyObject *self)
 {
     NSNumber *no = [self->obj noFiles];
@@ -309,6 +452,18 @@ static PyObject *pyDicomStudy_noFiles(pyDicomStudyObject *self)
     return PyInt_FromLong([no longValue]);
 }
 
+PyDoc_STRVAR(DicomStudyRawNoFiles_doc,
+			 "\n"
+			 "Returns the raw number of dicom files associated with the study.\n"
+			 "\n"
+			 "Args:\n"
+			 "    None.\n"
+			 "\n"
+			 "Returns:\n"
+			 "    int: See above.\n"
+			 "\n"
+			 );
+
 static PyObject *pyDicomStudy_rawNoFiles(pyDicomStudyObject *self)
 {
     NSNumber *no = [self->obj rawNoFiles];
@@ -319,6 +474,18 @@ static PyObject *pyDicomStudy_rawNoFiles(pyDicomStudyObject *self)
     
     return PyInt_FromLong([no longValue]);
 }
+
+PyDoc_STRVAR(DicomStudyNoFilesExcludingMultiframe_doc,
+			 "\n"
+			 "Returns the number of dicom files associated with the study, excluding any multiframe instances.\n"
+			 "\n"
+			 "Args:\n"
+			 "    None.\n"
+			 "\n"
+			 "Returns:\n"
+			 "    int: See above.\n"
+			 "\n"
+			 );
 
 static PyObject *pyDicomStudy_noFilesExcludingMultiFrames(pyDicomStudyObject *self)
 {
@@ -333,15 +500,25 @@ static PyObject *pyDicomStudy_noFilesExcludingMultiFrames(pyDicomStudyObject *se
 
 static PyMethodDef pyDicomStudyMethods[] =
 {
-    {"paths", (PyCFunction)pyDicomStudy_paths, METH_NOARGS, "Get a tuple of complete paths for the  contained DicomImages"},
-    {"images", (PyCFunction)pyDicomStudy_images, METH_NOARGS, "Get a tuple of DicomImage instances contained within the study"},
-    {"modalities", (PyCFunction)pyDicomStudy_modalities, METH_NOARGS, "A string representing the contained modalities of the study"},
-    {"imageSeries", (PyCFunction)pyDicomStudy_imageSeries, METH_NOARGS, "A tuple of contained DicomSeries instances"},
-    {"noFiles", (PyCFunction)pyDicomStudy_noFiles, METH_NOARGS, "The number of files associated with this study"},
-    {"rawNoFiles", (PyCFunction)pyDicomStudy_rawNoFiles, METH_NOARGS, "The raw number of files associated with this study"},
-    {"noFilesExcludingMultiFrames", (PyCFunction)pyDicomStudy_noFilesExcludingMultiFrames, METH_NOARGS, "The number of files associated with this study, excluding multi-frame"},
+    {"paths", (PyCFunction)pyDicomStudy_paths, METH_NOARGS, DicomStudyPaths_doc},
+    {"images", (PyCFunction)pyDicomStudy_images, METH_NOARGS, DicomStudyImages_doc},
+    {"modalities", (PyCFunction)pyDicomStudy_modalities, METH_NOARGS, DicomStudyModalities_doc},
+    {"imageSeries", (PyCFunction)pyDicomStudy_imageSeries, METH_NOARGS, DicomStudyImageSeries_doc},
+    {"noFiles", (PyCFunction)pyDicomStudy_noFiles, METH_NOARGS, DicomStudyNoFiles_doc},
+    {"rawNoFiles", (PyCFunction)pyDicomStudy_rawNoFiles, METH_NOARGS, DicomStudyRawNoFiles_doc},
+    {"noFilesExcludingMultiFrames", (PyCFunction)pyDicomStudy_noFilesExcludingMultiFrames, METH_NOARGS, DicomStudyNoFilesExcludingMultiframe_doc},
     {NULL}
 };
+
+# pragma mark -
+# pragma mark pyDicomStudyType definition
+
+PyDoc_STRVAR(DicomStudy_doc,
+			 "A python implementation of the OsiriX 'DicomStudy' class.\n"
+			 "DicomStudy is a convienience class used by the main browser within OsiriX to organise and group dicom instances within the same study.\n"
+			 "Instances of this class may not be created.  Instead instances are accessed\n"
+			 "via functions defined in the BrowserController class\n"
+			 );
 
 PyTypeObject pyDicomStudyType =
 {
@@ -361,12 +538,12 @@ PyTypeObject pyDicomStudyType =
     0,
     0,
     0,
-    0,
+    (reprfunc)DicomStudy_str,
     0,
     0,
     0,
     Py_TPFLAGS_DEFAULT,
-    "DicomStudy objects",
+    DicomStudy_doc,
     0,
     0,
     0,
@@ -385,6 +562,9 @@ PyTypeObject pyDicomStudyType =
     0,
     0,
 };
+
+# pragma mark -
+# pragma mark pyDicomStudy implementation
 
 @implementation pyDicomStudy
 
